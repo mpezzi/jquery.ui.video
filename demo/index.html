@@ -9,16 +9,22 @@
       font-size: 0.75em;
     }
   </style>
-  <style type="text/css">@import "../video.css";</style>
+  <style type="text/css">@import "../players/video-js/video-js.default.css";</style>
   
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  
   <script type="text/javascript" src="../jquery.ui.widget.js"></script>
   <script type="text/javascript" src="../jquery.ui.video.js"></script>
+  <script type="text/javascript" src="../players/video-js/jquery.ui.video.video-js.js"></script>
+  <script type="text/javascript" src="../players/flowplayer/jquery.ui.video.flowplayer.js"></script>
+  <script type="text/javascript" src="../players/video-js/video-js.js"></script>
+  
   <script type="text/javascript">
     $(function(){
       $('.video').video();
     });
   </script>
+  
 </head>
 
 <body>
@@ -27,7 +33,7 @@
   <img class="poster" src="http://video-js.zencoder.com/oceans-clip.png" />
 </a>
 
-<ol class="video video-autoplay video-preload">
+<ol class="video ui-video-autoplay ui-video-preload">
   <li><a href="http://vhs.houseandhome.com/hhtv/advertisements/click_lighting/click15.mp4" class="item"></a></li>
   <li><a href="http://vhs.houseandhome.com/hhtv/s01/opening2.mp4" class="item"></a></li>
   <li><a href="http://video-js.zencoder.com/oceans-clip.mp4" class="item"><img class="poster" src="http://video-js.zencoder.com/oceans-clip.png" /></a></li>
