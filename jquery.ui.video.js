@@ -45,34 +45,10 @@
       }, this._buildPlayer());
       
       this._buildPlaylist();
-      this._load();
       
       this.element.hide();
-    },
-    
-    // Public methods.
-    play: function(item) {
       
-    },
-    
-    pause: function() {
-      
-    },
-    
-    stop: function() {
-      
-    },
-    
-    prev: function() {
-      
-    },
-    
-    next: function() {
-      
-    },
-    
-    poster: function() {
-      
+      return this;
     },
     
     // Private methods.
@@ -112,6 +88,14 @@
     _setOption: function(key, value) {
       
     },
+    
+    // Public methods.
+    play: function(item) {},
+    pause: function() {},
+    stop: function() {},
+    prev: function() {},
+    next: function() {},
+    poster: function() {},
     
     // Debug.
     debug: function(s) {

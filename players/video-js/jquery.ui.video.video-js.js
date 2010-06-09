@@ -9,29 +9,34 @@
     },
     controls: {},
 
-    _load: function() {
+    _init: function() {
       this.debug('Using HTML5 - VideoJS');
       
       var self = this,
           o = self.options,
           
-          uiVideoHTML5 = $('<video></video>')
+          uiVideo = $('<video></video>')
             .addClass('video-js')
             .css('background', '#000')
             .attr({ width: o.width, height: o.height })
             .appendTo(self.container);
       
-      this.video = uiVideoHTML5;
+      this.video = uiVideo;
+      
+      this.video[0].addEventListener('play', this.onPlay.context(this), false);
+      this.video[0].addEventListener('ended', this.onEnd.context(this), false);
       
       this.debug(this);
     },
 
     onPlay: function(e) {
-      
+      this.codec = e.target.currentSrc.split('.')[1];
     },
 
     onEnd: function(e) {
-      
+      if ( this.playlist[this.current + 1] !== undefined ) {
+        this.play(this.current + 1);
+      }
     },
 
     play: function(item) {
