@@ -37,6 +37,9 @@
       self.video[0].addEventListener('play', this.onPlay.context(this), false);
       self.video[0].addEventListener('ended', this.onEnd.context(this), false);
       
+      // Add poster image.
+      self.video.attr('poster', self._buildPoster());
+      
       // Add first item to playlist.
       if ( self.playlist[0] !== undefined ) {
         $.each(self.codecs, function(e, type){
@@ -46,6 +49,20 @@
       
       // Initialize VideoJS
       VideoJS.setup();
+      
+      // If we have more than one video in playlist, add previous and next buttons to controls.
+      if ( self.playlist.length > 1 ) {
+        self.controls = {};
+        self.controls.next = $('<li class="vjs-playlist-control vjs-next"><span></span></li>')
+                                .css('cursor', 'pointer')
+                                .insertAfter( $('.vjs-play-control', self.container) )
+                                .click(function(){ self.play(self.current + 1) });
+                                
+        self.controls.prev = $('<li class="vjs-playlist-control vjs-prev"><span></span></li>')
+                                .css('cursor', 'pointer')
+                                .insertAfter( $('.vjs-play-control', self.container) )
+                                .click(function(){ self.play(self.current - 1) });
+      }
       
       this.api = videoJSPlayers[player];
       this.debug(this);
@@ -74,10 +91,10 @@
       self.video[0].stop();
     },
     prev: function() {
-      
+      self.play(self.current - 1)
     },
     next: function() {
-      
+      self.play(self.current + 1)
     },
     poster: function(src) {
       

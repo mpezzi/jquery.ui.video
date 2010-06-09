@@ -83,6 +83,10 @@
       
     },
     
+    _buildPoster: function() {
+      return $('img.poster:eq(0)', self.element).attr('src');
+    },
+    
     _buildOptions: function(o) {
       for ( var i in o ) {
         this.options[o[i]] = this.options[o[i]] ? this.options[o[i]] : this.element.hasClass('ui-video-' + o[i]);

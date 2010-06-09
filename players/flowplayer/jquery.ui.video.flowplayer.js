@@ -23,6 +23,11 @@
       
       // FlowPlayer
       uiVideoFlowplayer.flowplayer('../players/flowplayer/flowplayer-3.2.2.swf', {
+        plugins: { 
+          controls: { playlist: ( self.playlist.length > 1 ) } 
+        },
+        clip: { autoPlay: o.autoplay, autoBuffering: o.preload },
+        canvas: { backgroundImage: 'url('+ self._buildPoster() +')' },
         playlist: self.playlist
       });
       
@@ -44,8 +49,7 @@
     },
     next: function() {
 
-    },
-    
+    }
   };
   
   
