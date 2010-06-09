@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <html>
 <head>
   <title>jQuery Video Plugin Demo</title>
@@ -8,6 +10,10 @@
       font-family: arial, helvetica, sans-serif;
       font-size: 0.75em;
     }
+    
+    a img {
+      border: 0;
+    }
   </style>
   <style type="text/css">@import "../players/video-js/video-js.default.css";</style>
   
@@ -16,12 +22,13 @@
   <script type="text/javascript" src="../jquery.ui.widget.js"></script>
   <script type="text/javascript" src="../jquery.ui.video.js"></script>
   <script type="text/javascript" src="../players/video-js/jquery.ui.video.video-js.js"></script>
-  <script type="text/javascript" src="../players/flowplayer/jquery.ui.video.flowplayer.js"></script>
   <script type="text/javascript" src="../players/video-js/video-js.js"></script>
+  <script type="text/javascript" src="../players/flowplayer/jquery.ui.video.flowplayer.js"></script>
+  <script type="text/javascript" src="../players/flowplayer/flowplayer-3.2.2.min.js"></script>
   
   <script type="text/javascript">
-    $(function(){
-      $('.video').video();
+    $(document).ready(function(){
+      $('.video').video({ player: 'flowplayer' });
     });
   </script>
   
@@ -29,15 +36,17 @@
 
 <body>
 
-<a class="video" href="http://video-js.zencoder.com/oceans-clip.mp4">
-  <img class="poster" src="http://video-js.zencoder.com/oceans-clip.png" />
-</a>
+<div id="container">
+  <a class="video" id="video" href="http://vhs.houseandhome.com/hhtv/advertisements/click_lighting/click15.mp4"></a>
+  
+  <a class="xvideo" id="video" href="http://video-js.zencoder.com/oceans-clip.mp4"></a>
 
-<ol class="video ui-video-autoplay ui-video-preload">
-  <li><a href="http://vhs.houseandhome.com/hhtv/advertisements/click_lighting/click15.mp4" class="item"></a></li>
-  <li><a href="http://vhs.houseandhome.com/hhtv/s01/opening2.mp4" class="item"></a></li>
-  <li><a href="http://video-js.zencoder.com/oceans-clip.mp4" class="item"><img class="poster" src="http://video-js.zencoder.com/oceans-clip.png" /></a></li>
-</ol>
+  <ol class="video ui-video-autoplay ui-video-preload">
+    <li><a href="http://vhs.houseandhome.com/hhtv/advertisements/click_lighting/click15.mp4" class="item"></a></li>
+    <li><a href="http://vhs.houseandhome.com/hhtv/s01/opening2.mp4" class="item"></a></li>
+    <li><a href="http://video-js.zencoder.com/oceans-clip.mp4" class="item"><img class="poster" src="http://video-js.zencoder.com/oceans-clip.png" /></a></li>
+  </ol>
+</div> <!-- / #container -->
 
 </body>
 </html>

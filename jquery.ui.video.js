@@ -35,6 +35,12 @@
             .addClass('ui-video')
             .insertAfter(self.element);
       
+      self.element.css({
+        display: 'block',
+        width: o.width,
+        height: o.height
+      });
+      
       // Override certain options via ui-video-{option} classes.
       this._buildOptions(['preload', 'autoplay', 'controls']);
       
@@ -45,8 +51,6 @@
       }, this._buildPlayer());
       
       this._buildPlaylist();
-      
-      this.element.hide();
       
       return this;
     },
@@ -64,13 +68,13 @@
       
       // Load a single video.
       if ( self.element.context.tagName == 'A' ) {
-        self.playlist[0] = { src: self.element.attr('href') };
+        self.playlist[0] = { url: self.element.attr('href') };
       }
       
       // Load multiple videos.
       if ( self.element.context.tagName == 'OL' ) {
         $('li a.item', self.element).each(function(i){
-          self.playlist[i] = { src: $(this).attr('href') };
+          self.playlist[i] = { url: $(this).attr('href') };
         });
       }
     },

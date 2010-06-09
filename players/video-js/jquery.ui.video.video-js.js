@@ -1,4 +1,6 @@
 (function( $ ){
+  var player = 0;
+  
   $.ui.video.videojs = {
     codec: false,
     codecs: {
@@ -15,51 +17,94 @@
       var self = this,
           o = self.options,
           
+          uiVideoContainer = $('<div></div>')
+            .addClass('video-js-box')
+            .appendTo(self.container);
+          
           uiVideo = $('<video></video>')
             .addClass('video-js')
             .css('background', '#000')
             .attr({ width: o.width, height: o.height })
-            .appendTo(self.container);
+            .appendTo(uiVideoContainer),
+          
+          uiVideoFallback = $('<div></div>')
+            .addClass('vjs-no-video')
+            .appendTo(uiVideoContainer);
       
-      this.video = uiVideo;
+      self.video = uiVideo;
+      self.videoFallback = uiVideoFallback;
       
-      this.video[0].addEventListener('play', this.onPlay.context(this), false);
-      this.video[0].addEventListener('ended', this.onEnd.context(this), false);
+      self.video[0].addEventListener('play', this.onPlay.context(this), false);
+      self.video[0].addEventListener('ended', this.onEnd.context(this), false);
       
+      // Add first item to playlist.
+      if ( self.playlist[0] !== undefined ) {
+        $.each(self.codecs, function(e, type){
+          $('<source>').attr({ src: self._use_codec(self.playlist[0].url, e), type: type }).appendTo(self.video);
+        });     
+      }
+      
+      // Initialize VideoJS
+      VideoJS.setup();
+      
+      this.api = videoJSPlayers[player];
       this.debug(this);
+      
+      this.element.hide();
+      
+      player++;
     },
-
+    
+    play: function(item) {
+      if ( !item )
+        this.video[0].play();
+      
+      if ( this.current !== item && this.playlist[item] !== undefined ) {
+        var src = this._use_codec(this.playlist[item].url, this.codec);
+        this.video[0].src = src;
+        this.video[0].load();
+        this.video[0].play();
+        this.current = item;
+      }
+    },
+    pause: function() {
+      self.video[0].pause();
+    },
+    stop: function() {
+      self.video[0].stop();
+    },
+    prev: function() {
+      
+    },
+    next: function() {
+      
+    },
+    poster: function(src) {
+      
+    },
+    
+    // Listeners.
     onPlay: function(e) {
-      this.codec = e.target.currentSrc.split('.')[1];
+      this.codec = this._ext(e.target.currentSrc);
     },
 
     onEnd: function(e) {
       if ( this.playlist[this.current + 1] !== undefined ) {
         this.play(this.current + 1);
+      } else {
+        this.current = 0;
       }
     },
-
-    play: function(item) {
-      
+    
+    // Private methods.
+    _use_codec: function(src, type) {
+      return src.replace('.' + this._ext(src), '.' + type);
     },
-    pause: function() {
-
-    },
-    stop: function() {
-
-    },
-    prev: function() {
-
-    },
-    next: function() {
-
-    },
-    poster: function(src) {
-      
-    },
-    _use_codec: function(src, codec) {
-      
+    _ext: function(src) {
+      var parts = src.split('.');
+      return parts[ parts.length - 1 ];
     }
+    
   };
 })(jQuery);
 
