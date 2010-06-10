@@ -220,7 +220,7 @@ var VideoJS = Class.extend({
 
   // Hide the controller
   hideController: function(){
-    this.controls.style.display = "none";
+    //this.controls.style.display = "none";
   },
 
   buildPoster: function(){

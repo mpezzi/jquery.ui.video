@@ -22,7 +22,7 @@
       autoplay: false,
       controls: false,
       player: null,
-      html5: 'videojs',
+      html5: 'html5',
       flash: 'flowplayer'
     },
     
@@ -58,7 +58,7 @@
     // Private methods.
     _buildPlayer: function() {
       return ( this.options.player == null ) ?
-        $.ui.video.support.html5 ?
+        $.ui.video.support.html5() ?
           $.ui.video[this.options.html5] : $.ui.video[this.options.flash] :
           $.ui.video[this.options.flash];
     },
@@ -74,7 +74,12 @@
       // Load multiple videos.
       if ( self.element.context.tagName == 'OL' ) {
         $('li a.item', self.element).each(function(i){
-          self.playlist[i] = { url: $(this).attr('href') };
+          var item = {};
+          
+          item.url = $(this).attr('href');
+          item.forced = $(this).hasClass('item-controls-disabled');
+          
+          self.playlist[i] = item;
         });
       }
     },
@@ -84,7 +89,7 @@
     },
     
     _buildPoster: function() {
-      return $('img.poster:eq(0)', self.element).attr('src');
+      return $('img.poster', self.element).attr('src');
     },
     
     _buildOptions: function(o) {
@@ -114,7 +119,7 @@
   
   $.ui.video.support = {
     html5: function() {
-      return !!$('<video>').canPlayType;
+      return !!document.createElement('video').canPlayType;
     },
     flash: function() {
       return false;

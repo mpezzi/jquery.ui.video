@@ -21,6 +21,8 @@
       
       this.flowplayer = uiVideoFlowplayer;
       
+      this._parsePlaylist();
+      
       // FlowPlayer
       uiVideoFlowplayer.flowplayer('../players/flowplayer/flowplayer-3.2.2.swf', {
         plugins: { 
@@ -49,6 +51,18 @@
     },
     next: function() {
 
+    },
+    
+    // Private methods.
+    _parsePlaylist: function() {
+      // url: '<?php print $preroll["file"]; ?>', position: 0, controls: { playlist: false, enabled: { play: false, scrubber: false } }
+      
+      for ( var i in this.playlist ) {
+        if ( this.playlist[i].forced ) {
+          this.playlist[i].position = 0;
+          this.playlist[i].controls = { playlist: false, enabled: { play: false, scrubber: false } };
+        }
+      }
     }
   };
   

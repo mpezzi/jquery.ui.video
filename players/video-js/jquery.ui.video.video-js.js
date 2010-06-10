@@ -23,13 +23,19 @@
           
           uiVideo = $('<video></video>')
             .addClass('video-js')
-            .css('background', '#000')
+            .css('background', '#fff')
             .attr({ width: o.width, height: o.height })
             .appendTo(uiVideoContainer),
           
           uiVideoFallback = $('<div></div>')
             .addClass('vjs-no-video')
             .appendTo(uiVideoContainer);
+      
+      if ( o.autoplay )
+        uiVideo.attr('autoplay', 'autoplay');
+        
+      if ( o.preload )
+        uiVideo.attr('preload', 'preload');
       
       self.video = uiVideo;
       self.videoFallback = uiVideoFallback;
@@ -103,6 +109,15 @@
     // Listeners.
     onPlay: function(e) {
       this.codec = this._ext(e.target.currentSrc);
+      
+      // Check if video is forced.
+      if ( this.playlist[this.current].forced ) {
+        this.controls.next.hide();
+        this.controls.prev.hide();
+      } else {
+        this.controls.next.show();
+        this.controls.prev.show();
+      }
     },
 
     onEnd: function(e) {

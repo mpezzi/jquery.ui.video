@@ -1,0 +1,38 @@
+.video-container {
+  position: relative;
+  border: 1px solid #333;
+}
+
+.video-container video {
+  background: #fff;
+}
+
+.video-loader {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #000 url(loader-1.gif) center center no-repeat;
+  opacity: 0.5;
+}
+
+.video-controller {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #c6c6c6;
+}
+
+.video-controller {
+  margin: 0;
+  padding: 0;
+}
+
+.video-controller li {
+  float: left;
+  width: 25px;
+  height: 25px;
+  margin: 5px;
+  background: #808080;
+  list-style: none;
+}
