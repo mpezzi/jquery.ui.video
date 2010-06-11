@@ -12,8 +12,15 @@
   position: absolute;
   top: 0;
   left: 0;
-  background: #000 url(loader-1.gif) center center no-repeat;
-  opacity: 0.5;
+  background: #fff url(loader-white.gif) center center no-repeat;
+}
+
+.video-error {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
 }
 
 .video-controller {

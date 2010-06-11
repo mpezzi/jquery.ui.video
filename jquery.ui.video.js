@@ -89,7 +89,7 @@
     },
     
     _buildPoster: function() {
-      return $('img.poster', self.element).attr('src');
+      return $('img.poster', this.element).attr('src');
     },
     
     _buildOptions: function(o) {
