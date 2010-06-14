@@ -23,17 +23,15 @@ $.ui.video.html5 = {
   //     buttonRadius: 5
   //   },
   codec: null,
-  codecs: {
-    mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-    ogg: 'video/ogg; codecs="theora, vorbis"',
-    webm: 'video/webm; codecs="vp8, vorbis"'
-  },
+  codecs: { mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', ogg: 'video/ogg; codecs="theora, vorbis"', webm: 'video/webm; codecs="vp8, vorbis"' },
   
+  // Initialize player.
   _init: function() {
-    this.buildPlayer();
+    this._playerBuild();
     this.element.hide();
   },
   
+  // Public methods.
   play: function(item) {
     if ( this.current !== item && this.playlist[item] !== undefined ) {
       this.video[0].src = this.getFile(this.playlist[item].url);
@@ -42,16 +40,19 @@ $.ui.video.html5 = {
       this.current = item;
     }
   },
-  
   prev: function() {
     this.play(this.current - 1);
   },
-  
   next: function() {
     this.play(this.current + 1);
   },
+  controller: function(visible) {
+    visible ? this._controllerShow() : this._controllerHide();
+    return this.element;
+  },
   
-  buildPlayer: function() {
+  // Private methods.
+  _playerBuild: function() {
     this.current = 0;
     
     this.container = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-container').appendTo(this.container);
@@ -62,9 +63,8 @@ $.ui.video.html5 = {
     this.options.autoplay ? this.video.attr('autoplay', 'autoplay') : false;
     this.options.preload ? this.video.attr('preload', 'preload') : false;
     
-    this.buildPoster();
-    this.showPoster();
-    this.buildController();
+    this._posterBuild();
+    this._controllerBuild();
     
     // Video Events.
     this.video[0].addEventListener('loadstart', this.onLoadStart.context(this), false);
@@ -99,8 +99,7 @@ $.ui.video.html5 = {
       this.loadPlaylist();
     }
   },
-  
-  buildController: function() {
+  _controllerBuild: function() {
     this.onController = false;
     
     // Build controller.
@@ -129,59 +128,49 @@ $.ui.video.html5 = {
       this.control.next.show();
     }
   },
-  
-  positionController: function() {
+  _controllerPosition: function() {
     scrubber = ( this.playlist.length > 1 ) ? 172 : 108;
     this.control.scrubber.width(this.options.width - scrubber);
   },
-  
-  showController: function() {
+  _controllerShow: function() {
     if ( this.controller.is(':visible') ) return;
     
-    this.positionController();
+    this._controllerPosition();
     this.controller.fadeIn();
   },
-  
-  hideController: function(delayed) {
+  _controllerHide: function(delayed) {
     if ( delayed !== undefined ) {
-      clearInterval(this.hideControllerDelay);
+      clearInterval(this._controllerHideDelay);
       if ( !this.onController ) {
         //this.debug('[start: hideControllerDelay]');
-        this.hideControllerDelay = setTimeout(function(){ 
+        this._controllerHideDelay = setTimeout(function(){ 
           this.debug('[end: hideControllerDelay]');
-          this.hideController();
+          this._controllerHide();
         }.context(this), 4000);  
       }
     } else {
       //this.controller.fadeOut();
     }
   },
-  
-  buildPoster: function() {
+  _posterBuild: function() {
     this.video.attr('poster', this._buildPoster);
   },
-  
-  positionPoster: function() {
+  _posterPosition: function() {
     
   },
-  
-  showPoster: function() {
+  _posterShow: function() {
     
   },
-  
-  hidePoster: function() {
+  _posterHide: function() {
     
   },
-  
-  showLoader: function() {
+  _loaderShow: function() {
     this.loader.fadeIn(200);
   },
-  
-  hideLoader: function() {
+  _loaderHide: function() {
     this.loader.fadeOut(1000);
   },
-  
-  showError: function(error) {
+  _errorShow: function(error) {
     var message;
     
     if ( this.error.is(':hidden') )
@@ -197,17 +186,101 @@ $.ui.video.html5 = {
     
     this.error.find('span').html(message);
   },
-  
-  hideError: function() {
+  _errorHide: function() {
     if ( this.error.is(':visible') )
       this.error.fadeOut();
   },
   
+  // Controller events.
+  onControllerPlay: function(e) {
+    this.debug('[event controller: onControllerPlay]');
+    this.video[0].paused ? this.video[0].play() : this.video[0].pause();
+  },
+  onControllerPrev: function(e) {
+    this.debug('[event controller: onControllerPrev]');
+    this.prev();
+  },
+  onControllerNext: function(e) {
+    this.debug('[event controller: onControllerNext]');
+    this.next();
+  },
+  onControllerScrubberStart: function(e) {
+    this.debug('[event controller: onControllerScrubberStart]');
+  },
+  onControllerScrubberStop: function(e) {
+    this.debug('[event controller: onControllerScrubberStop]');
+  },
+  onControllerVolumeStart: function(e) {
+    this.debug('[event controller: onControllerVolumeStart]');
+  },
+  onControllerVolumeStop: function(e) {
+    this.debug('[event controller: onControllerVolumeStop]');
+  },
+  onControllerFullscreen: function(e) {
+    this.debug('[event controller: onControllerFullscreen]');
+  },
+  onControllerShow: function(e) {
+    this.debug('[event controller: onControllerShow]');
+    this._controllerShow();
+    this._controllerHide(true);
+  },
+  onControllerHide: function(e) {
+    this.debug('[event controller: onControllerHide]');
+    this._controllerHide(true);
+  },
+  onControllerOver: function(e) {
+    this.debug('[event controller: onControllerOver]');
+    this.onController = true;
+  },
+  onControllerOut: function(e) {
+    this.debug('[event controller: onControllerOut]');
+    this.onController = false;
+  }
+  
+  // Player events.
+  onPlay: function(e) {
+    this.debug('[event player: onPlay]');
+  },
+  onPlaying: function(e) {
+    this.debug('[event player: onPlaying]');
+    this._loaderHide();
+    this._errorHide();
+  },
+  onPause: function(e) {
+    this.debug('[event player: onPause]');
+  },
+  onSeek: function(e) {
+    this.debug('[event player: onSeek]');
+  },
+  onEnded: function(e) {
+    this.debug('[event player: onEnded]');
+    this.playlist[this.current + 1] !== undefined ? this.next() : this.current = 0;
+  },
+  onVolumeChange: function(e) {
+    this.debug('[event player: onVolumeChange]');
+  },
+  onLoadStart: function(e) {
+    this.debug('[event player: onLoadStart]');
+  },
+  onLoadedData: function(e) {
+    this.debug('[event player: onLoadedData]');
+  },
+  onStalled: function(e) {
+    this.debug('[event player: onStalled]');
+    this._loaderShow();
+  },
+  onWaiting: function(e) {
+    this.debug('[event player: onWaiting]');
+    this._loaderShow();
+  },
+  onError: function(e) {
+    this.debug('[event player: onError]');
+  },
+  
+  // Old functions.
   sizeProgressBar: function() {
     
   },
-  
-  
   
   playProgressSet: function() {
     
@@ -228,7 +301,6 @@ $.ui.video.html5 = {
   playProgressUpdate: function() {
     
   },
-  
   
   updateTimeDisplay: function() {
     
@@ -318,12 +390,12 @@ $.ui.video.html5 = {
   
   onStalled: function(e) {
     this.debug('[event: onStalled]');
-    this.showLoader();
+    this._loaderShow();
   },
   
   onWaiting: function(e) {
     this.debug('[event: onWaiting]');
-    this.showLoader();
+    this._loaderShow();
   },
   
   onPlay: function(e) {
@@ -333,8 +405,8 @@ $.ui.video.html5 = {
   
   onPlaying: function(e) {
     this.debug('[event: onPlaying]');
-    this.hideLoader();
-    this.hideError();
+    this._loaderHide();
+    this._errorHide();
   },
   
   onPause: function(e) {
@@ -424,8 +496,8 @@ $.ui.video.html5 = {
   
   onControlContainerMouseMove: function(e) {
     //this.debug('[event: onControlContainerMouseMove]');
-    this.showController();
-    this.hideController(true);
+    this._controllerShow();
+    this._controllerHide(true);
   },
   
   onControlContainerMouseLeave: function(e) {
