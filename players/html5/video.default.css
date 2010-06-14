@@ -1,6 +1,7 @@
 .video-container {
   position: relative;
   border: 1px solid #333;
+  font-family: "Lucida Grande", arial, helvetica, sans-serif;
 }
 
 .video-container video {
@@ -20,7 +21,13 @@
   position: absolute;
   top: 0;
   left: 0;
-  background: #fff;
+  background: #fff url(error.png) 50% 20px no-repeat;
+  text-align: center;
+}
+
+.video-error span {
+  display: block;
+  padding: 260px 10em 0 10em;
 }
 
 .video-controller {
@@ -37,7 +44,7 @@
 .video-controller li {
   float: left;
   width: 25px;
-  height: 25px;
+  height: 24px;
   margin: 5px 0 5px 5px;
   border: 1px solid #000;
   background: #000;
@@ -52,3 +59,24 @@
   background: -moz-linear-gradient(top,  #222,  #000);
 }
 
+.video-control-scrubber {
+  position: relative;
+}
+
+.video-control-scrubber .video-control-bar {
+  display: block;
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  height: 10px;
+  
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#dadada), to(#fff));
+  background: -moz-linear-gradient(top,  #dadada,  #ffff);
+}
+
+.video-control-scrubber-total {
+  width: 375px;
+  background-color: #808080;
+}

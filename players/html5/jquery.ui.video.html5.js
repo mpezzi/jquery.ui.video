@@ -8,24 +8,35 @@
  * HTML5 Plugin based off of VideoJS. http://videojs.com
  */
 
-// Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
-//(function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.Class = function(){}; Class.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function Class() { if ( !initializing && this.init ) this.init.apply(this, arguments); } Class.prototype = prototype; Class.constructor = Class; Class.extend = arguments.callee; return Class;};})();
-
 (function($){
 
 var player = 0;
 
 $.ui.video.html5 = {
+  // defaults: {
+  //     buttonWidth: 25,
+  //     buttonHeight: 24,
+  //     buttonMarginTop: 5,
+  //     buttonMarginRight: 0,
+  //     buttonMarginBottom: 5,
+  //     buttonMarginLeft: 5,
+  //     buttonRadius: 5
+  //   },
+  codec: null,
+  codecs: {
+    mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+    ogg: 'video/ogg; codecs="theora, vorbis"',
+    webm: 'video/webm; codecs="vp8, vorbis"'
+  },
+  
   _init: function() {
     this.buildPlayer();
-    
-    // Hide original construction element.
     this.element.hide();
   },
   
   play: function(item) {
     if ( this.current !== item && this.playlist[item] !== undefined ) {
-      this.video[0].src = this.playlist[item].url;
+      this.video[0].src = this.getFile(this.playlist[item].url);
       this.video[0].load();
       this.video[0].play();
       this.current = item;
@@ -43,10 +54,10 @@ $.ui.video.html5 = {
   buildPlayer: function() {
     this.current = 0;
     
-    this.container = $('<div>').css({ width: this.options.width, height: this.options.height }).addClass('video-container').appendTo(this.container);
-    this.video = $('<video>').attr({ width: this.options.width, height: this.options.height }).appendTo(this.container);
-    this.loader = $('<div>').css({ width: this.options.width, height: this.options.height }).addClass('video-loader').appendTo(this.container);
-    this.error = $('<div>').css({ width: this.options.width, height: this.options.height }).addClass('video-error').appendTo(this.container);
+    this.container = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-container').appendTo(this.container);
+    this.video = $('<video></video>').attr({ width: this.options.width, height: this.options.height }).appendTo(this.container);
+    this.loader = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-loader').appendTo(this.container);
+    this.error = $('<div><span></span></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-error').appendTo(this.container);
     
     this.options.autoplay ? this.video.attr('autoplay', 'autoplay') : false;
     this.options.preload ? this.video.attr('preload', 'preload') : false;
@@ -82,6 +93,11 @@ $.ui.video.html5 = {
     this.control.volume.bind('mousedown', this.onControlVolumeMouseDown.context(this));
     this.control.volume.bind('mouseup', this.onControlVolumeMouseUp.context(this));
     this.control.fullscreen.bind('mouseup', this.onControlFullscreenClick.context(this));
+    
+    // Define the first video source.
+    if ( this.options.autoplay ) {
+      this.loadPlaylist();
+    }
   },
   
   buildController: function() {
@@ -96,16 +112,16 @@ $.ui.video.html5 = {
       prev: $('<li></li>').hide().attr('title', 'Previous').addClass('video-control-button video-control-prev').appendTo(this.controller),
       next: $('<li></li>').hide().attr('title', 'Next').addClass('video-control-button video-control-next').appendTo(this.controller),
       scrubber: $('<li></li>').addClass('video-control-scrubber').appendTo(this.controller),
-      progress: $('<span></span>').addClass('video-control-scrubber-progress'),
-      buffer: $('<span></span>').addClass('video-control-scrubber-buffer'),
-      total: $('<span></span>').addClass('video-control-scrubber-total'),
-      time: $('<span></span>').addClass('video-control-scrubber-time'),
+      progress: $('<span></span>').addClass('video-control-bar video-control-scrubber-progress'),
+      buffer: $('<span></span>').addClass('video-control-bar video-control-scrubber-buffer'),
+      total: $('<span></span>').addClass('video-control-bar video-control-scrubber-total'),
+      time: $('<span></span>').addClass('video-control-bar video-control-scrubber-time'),
       volume: $('<li></li>').attr('title', 'Volume').addClass('video-control-volume').appendTo(this.controller),
       fullscreen: $('<li></li>').attr('title', 'Fullscreen').addClass('video-control-button video-control-fullscreen').appendTo(this.controller)
     };
     
     // Add progress elements to scrubber.
-    $([this.control.progress, this.control.buffer, this.control.total]).appendTo(this.scrubber);
+    $([this.control.progress, this.control.buffer, this.control.total]).appendTo(this.control.scrubber);
     
     // Show playlist buttons.
     if ( this.playlist.length > 1 ) {
@@ -137,7 +153,7 @@ $.ui.video.html5 = {
         }.context(this), 4000);  
       }
     } else {
-      this.controller.fadeOut();
+      //this.controller.fadeOut();
     }
   },
   
@@ -165,37 +181,54 @@ $.ui.video.html5 = {
     this.loader.fadeOut(1000);
   },
   
-  showError: function() {
-    this.error.fadeIn();
+  showError: function(error) {
+    var message;
+    
+    if ( this.error.is(':hidden') )
+      this.error.fadeIn();
+    
+    switch ( error.code ) {
+      case error.MEDIA_ERR_ABORTED: message = 'You aborted the video playback.'; break;
+      case error.MEDIA_ERR_NETWORK: message = 'A network error caused the video download to fail part-way.'; break;
+      case error.MEDIA_ERR_DECODE: message = 'The video playback was aborted due to a corruption problem <br />or because the video used features your browser did not support.'; break;
+      case error.MEDIA_ERR_SRC_NOT_SUPPORTED: message = 'The video could not be loaded, either because the server or <br />network failed or because the format is not supported.'; break;
+      default: message = 'An unknown error occurred.'; break;
+    }
+    
+    this.error.find('span').html(message);
   },
   
   hideError: function() {
-    this.error.fadeOut();
+    if ( this.error.is(':visible') )
+      this.error.fadeOut();
   },
   
   sizeProgressBar: function() {
     
   },
   
-  trackPlayProgress: function() {
+  
+  
+  playProgressSet: function() {
     
   },
   
-  stopTrackingPlayProgress: function() {
+  playProgressSetWithEvent: function() {
     
   },
   
-  updatePlayProgress: function() {
+  playProgressTrack: function() {
     
   },
   
-  setPlayProgress: function(newProgress) {
+  playProgressUntrack: function() {
     
   },
   
-  setPlayProgressWithEvent: function() {
+  playProgressUpdate: function() {
     
   },
+  
   
   updateTimeDisplay: function() {
     
@@ -241,6 +274,39 @@ $.ui.video.html5 = {
     
   },
   
+  getFile: function(src) {
+    if ( this.codec == null ) {
+      for ( var i in this.codecs ) {
+        if ( this.video[0].canPlayType(this.codecs[i]) && this.codec == null ) {
+          this.codec = i;
+        }
+      }  
+    }
+    
+    return src.replace('.' + this.getFileType(src), '.' + this.codec);
+  },
+  
+  getFileType: function(src) {
+    var parts = src.split('?')[0].split('.');
+    return parts[parts.length - 1];
+  },
+  
+  loadPlaylist: function() {
+    if ( this.video[0].src == '' ) {
+      this.video[0].src = this.getFile(this.playlist[0].url);
+      this.video[0].load();
+    }
+  },
+  
+  _blockTextSelection: function() {
+    document.body.focus();
+    document.onselectstart = function () { return false; };
+  },
+  
+  _unblockTextSelection: function() {
+    document.onselectstart = function () { return true; };
+  },
+  
   // Event listeners.
   onLoadStart: function(e) {
     this.debug('[event: onLoadStart]');
@@ -261,20 +327,14 @@ $.ui.video.html5 = {
   },
   
   onPlay: function(e) {
-    this.debug('[event: onPlay]');
-    
-    // If there are no defined videos, play the first one.
-    if ( this.video[0].src == '' ) {
-      this.video[0].src = this.playlist[0].url;
-      this.video[0].load();
-    }
-    
-    this.video[0].play();
+    this.loadPlaylist();    
+    this.debug('[event: onPlay - ' + this.video[0].src + ']');
   },
   
   onPlaying: function(e) {
     this.debug('[event: onPlaying]');
     this.hideLoader();
+    this.hideError();
   },
   
   onPause: function(e) {
@@ -301,8 +361,8 @@ $.ui.video.html5 = {
   
   onError: function(e) {
     this.debug('[event: onError]');
-    this.debug(e);
     this.debug(this.video[0].error);
+    this.showError(this.video[0].error);
   },
     
   onControlPlayClick: function(e) {
@@ -322,6 +382,28 @@ $.ui.video.html5 = {
   
   onControlProgressMouseDown: function(e) {
     this.debug('[event: onControlProgressMouseDown]');
+    
+    var self = this;
+    
+    if ( this.video[0].paused ) {
+      this.videoWasPlaying = false;
+    } else {
+      this.videoWasPlaying = true;
+      this.video[0].pause();
+    }
+    
+    this._blockTextSelection();
+    
+    $(document).bind('mousemove', this.setPlayProgressWithEvent().context(this));
+    
+    $(document).bind('mouseup', function(){
+      self._unblockTextSelection();
+      $(document).unbind('mousemove mouseup');
+      if ( this.videoWasPlaying ) {
+        this.video[0].play();
+        this.trackPlayProgress()
+      }
+    });
   },
   
   onControlProgressMouseUp: function(e) {
