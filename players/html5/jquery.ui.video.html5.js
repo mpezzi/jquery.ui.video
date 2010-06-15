@@ -13,15 +13,7 @@
 var player = 0;
 
 $.ui.video.html5 = {
-  // defaults: {
-  //     buttonWidth: 25,
-  //     buttonHeight: 24,
-  //     buttonMarginTop: 5,
-  //     buttonMarginRight: 0,
-  //     buttonMarginBottom: 5,
-  //     buttonMarginLeft: 5,
-  //     buttonRadius: 5
-  //   },
+  current: null,
   codec: null,
   codecs: { mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', ogg: 'video/ogg; codecs="theora, vorbis"', webm: 'video/webm; codecs="vp8, vorbis"' },
   
@@ -33,12 +25,19 @@ $.ui.video.html5 = {
   
   // Public methods.
   play: function(item) {
-    if ( this.current !== item && this.playlist[item] !== undefined ) {
-      this.video[0].src = this.getFile(this.playlist[item].url);
+    if ( item !== undefined && this.current !== item && this.playlist[item] !== undefined ) {
+      this.video[0].src = this._fileGet(this.playlist[item].url);
       this.video[0].load();
-      this.video[0].play();
       this.current = item;
     }
+    
+    this.paused() ? this.video[0].play() : this.pause();
+  },
+  pause: function() {
+    this.video[0].pause();
+  },
+  paused: function() {
+    return this.video[0].paused;
   },
   prev: function() {
     this.play(this.current - 1);
@@ -53,8 +52,6 @@ $.ui.video.html5 = {
   
   // Private methods.
   _playerBuild: function() {
-    this.current = 0;
-    
     this.container = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-container').appendTo(this.container);
     this.video = $('<video></video>').attr({ width: this.options.width, height: this.options.height }).appendTo(this.container);
     this.loader = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-loader').appendTo(this.container);
@@ -74,30 +71,29 @@ $.ui.video.html5 = {
     this.video[0].addEventListener('play', this.onPlay.context(this), false);
     this.video[0].addEventListener('playing', this.onPlaying.context(this), false);
     this.video[0].addEventListener('pause', this.onPause.context(this), false);
-    this.video[0].addEventListener('seeking', this.onSeeking.context(this), false);
+    this.video[0].addEventListener('seeking', this.onSeek.context(this), false);
     this.video[0].addEventListener('ended', this.onEnded.context(this), false);
     this.video[0].addEventListener('volumechange', this.onVolumeChange.context(this), false);
     this.video[0].addEventListener('error', this.onError.context(this), false);
     
     // Control Events.
-    this.video.bind('mouseup', this.onControlPlayClick.context(this));
-    this.container.bind('mousemove', this.onControlContainerMouseMove.context(this));
-    this.container.bind('mouseleave', this.onControlContainerMouseLeave.context(this));
-    this.controller.bind('mouseenter', this.onControlControllerMouseEnter.context(this));
-    this.controller.bind('mouseleave', this.onControlControllerMouseLeave.context(this));
-    this.control.play.bind('mouseup', this.onControlPlayClick.context(this));
-    this.control.prev.bind('mouseup', this.onControlPrevClick.context(this));
-    this.control.next.bind('mouseup', this.onControlNextClick.context(this));
-    this.control.scrubber.bind('mousedown', this.onControlProgressMouseDown.context(this));
-    this.control.scrubber.bind('mouseup', this.onControlProgressMouseUp.context(this));
-    this.control.volume.bind('mousedown', this.onControlVolumeMouseDown.context(this));
-    this.control.volume.bind('mouseup', this.onControlVolumeMouseUp.context(this));
-    this.control.fullscreen.bind('mouseup', this.onControlFullscreenClick.context(this));
+    this.video.bind('mouseup', this.onControllerPlay.context(this));
+    this.container.bind('mousemove', this.onControllerShow.context(this));
+    this.container.bind('mouseleave', this.onControllerHide.context(this));
+    this.controller.bind('mouseenter', this.onControllerOver.context(this));
+    this.controller.bind('mouseleave', this.onControllerOut.context(this));
+    this.control.play.bind('mouseup', this.onControllerPlay.context(this));
+    this.control.prev.bind('mouseup', this.onControllerPrev.context(this));
+    this.control.next.bind('mouseup', this.onControllerNext.context(this));
+    this.control.scrubber.bind('mousedown', this.onControllerScrubberStart.context(this));
+    this.control.scrubber.bind('mouseup', this.onControllerScrubberStop.context(this));
+    this.control.volume.bind('mousedown', this.onControllerVolumeStart.context(this));
+    this.control.volume.bind('mouseup', this.onControllerVolumeStop.context(this));
+    this.control.fullscreen.bind('mouseup', this.onControllerFullscreen.context(this));
     
-    // Define the first video source.
-    if ( this.options.autoplay ) {
-      this.loadPlaylist();
-    }
+    // Initialize playlist.
+    if ( this.options.autoplay )
+      this._playlistInit();
   },
   _controllerBuild: function() {
     this.onController = false;
@@ -149,7 +145,29 @@ $.ui.video.html5 = {
         }.context(this), 4000);  
       }
     } else {
-      //this.controller.fadeOut();
+      this.controller.fadeOut();
+    }
+  },
+  _fileGet: function(src) {
+    if ( this.codec == null ) {
+      for ( var i in this.codecs ) {
+        if ( this.video[0].canPlayType(this.codecs[i]) && this.codec == null ) {
+          this.codec = i;
+        }
+      }  
+    }
+    
+    return src.replace('.' + this._fileGetExtension(src), '.' + this.codec);
+  },
+  _fileGetExtension: function(src) {
+    var parts = src.split('?')[0].split('.');
+    return parts[parts.length - 1];
+  },
+  _playlistInit: function() {
+    if ( this.video[0].src == '' ) {
+      this.video[0].src = this._fileGet(this.playlist[0].url);
+      this.video[0].load();
+      this.current = 0;
     }
   },
   _posterBuild: function() {
@@ -194,7 +212,7 @@ $.ui.video.html5 = {
   // Controller events.
   onControllerPlay: function(e) {
     this.debug('[event controller: onControllerPlay]');
-    this.video[0].paused ? this.video[0].play() : this.video[0].pause();
+    this.play();
   },
   onControllerPrev: function(e) {
     this.debug('[event controller: onControllerPrev]');
@@ -220,12 +238,12 @@ $.ui.video.html5 = {
     this.debug('[event controller: onControllerFullscreen]');
   },
   onControllerShow: function(e) {
-    this.debug('[event controller: onControllerShow]');
+    //this.debug('[event controller: onControllerShow]');
     this._controllerShow();
     this._controllerHide(true);
   },
   onControllerHide: function(e) {
-    this.debug('[event controller: onControllerHide]');
+    //this.debug('[event controller: onControllerHide]');
     this._controllerHide(true);
   },
   onControllerOver: function(e) {
@@ -235,11 +253,12 @@ $.ui.video.html5 = {
   onControllerOut: function(e) {
     this.debug('[event controller: onControllerOut]');
     this.onController = false;
-  }
+  },
   
   // Player events.
   onPlay: function(e) {
-    this.debug('[event player: onPlay]');
+    this._playlistInit();
+    this.debug('[event player: onPlay] - ' + this.video[0].src);
   },
   onPlaying: function(e) {
     this.debug('[event player: onPlaying]');
@@ -271,81 +290,66 @@ $.ui.video.html5 = {
   },
   onWaiting: function(e) {
     this.debug('[event player: onWaiting]');
+    this._errorHide();
     this._loaderShow();
   },
   onError: function(e) {
     this.debug('[event player: onError]');
+    this._errorShow(this.video[0].error);
   },
   
   // Old functions.
   sizeProgressBar: function() {
     
   },
-  
   playProgressSet: function() {
     
   },
-  
   playProgressSetWithEvent: function() {
     
   },
-  
   playProgressTrack: function() {
     
   },
-  
   playProgressUntrack: function() {
     
   },
-  
   playProgressUpdate: function() {
     
   },
-  
   updateTimeDisplay: function() {
     
   },
-  
   setVolume: function() {
     
   },
-  
   setVolumeWithEvent: function() {
     
   },
-  
   updateVolumeDisplay: function() {
   
   },
-  
   fullscreenOn: function() {
   
   },
-  
   fullscreenOff: function() {
   
   },
-  
   blockTextSelection: function() {
     
   },
-  
   unblockTextSelection: function() {
     
   },
-  
   formatTime: function(seconds) {
     
   },
-  
   getRelativePosition: function(x, relativeElement) {
     
   },
-  
   findPosX: function(obj) {
     
   },
-  
   getFile: function(src) {
     if ( this.codec == null ) {
       for ( var i in this.codecs ) {
@@ -357,162 +361,19 @@ $.ui.video.html5 = {
     
     return src.replace('.' + this.getFileType(src), '.' + this.codec);
   },
-  
   getFileType: function(src) {
     var parts = src.split('?')[0].split('.');
     return parts[parts.length - 1];
   },
-  
   loadPlaylist: function() {
-    if ( this.video[0].src == '' ) {
-      this.video[0].src = this.getFile(this.playlist[0].url);
-      this.video[0].load();
-    }
+    
   },
-  
   _blockTextSelection: function() {
     document.body.focus();
     document.onselectstart = function () { return false; };
   },
-  
   _unblockTextSelection: function() {
     document.onselectstart = function () { return true; };
-  },
-  
-  // Event listeners.
-  onLoadStart: function(e) {
-    this.debug('[event: onLoadStart]');
-  },
-  
-  onLoadedData: function(e) {
-    this.debug('[event: onLoadedData]');
-  },
-  
-  onStalled: function(e) {
-    this.debug('[event: onStalled]');
-    this._loaderShow();
-  },
-  
-  onWaiting: function(e) {
-    this.debug('[event: onWaiting]');
-    this._loaderShow();
-  },
-  
-  onPlay: function(e) {
-    this.loadPlaylist();    
-    this.debug('[event: onPlay - ' + this.video[0].src + ']');
-  },
-  
-  onPlaying: function(e) {
-    this.debug('[event: onPlaying]');
-    this._loaderHide();
-    this._errorHide();
-  },
-  
-  onPause: function(e) {
-    this.debug('[event: onPause]');
-  },
-  
-  onSeeking: function(e) {
-    this.debug('[event: onSeeking]');
-  },
-  
-  onEnded: function(e) {
-    this.debug('[event: onEnded]');
-    
-    if ( this.playlist[this.current + 1] !== undefined ) {
-      this.next();
-    } else {
-      this.current = 0;
-    }
-  },
-  
-  onVolumeChange: function(e) {
-    this.debug('[event: onVolumeChange]');
-  },
-  
-  onError: function(e) {
-    this.debug('[event: onError]');
-    this.debug(this.video[0].error);
-    this.showError(this.video[0].error);
-  },
-    
-  onControlPlayClick: function(e) {
-    this.debug('[event: onControlPlayClick]');
-    this.video[0].paused ? this.video[0].play() : this.video[0].pause();
-  },
-  
-  onControlPrevClick: function(e) {
-    this.debug('[event: onControlPrevClick]');
-    this.prev();
-  },
-  
-  onControlNextClick: function(e) {
-    this.debug('[event: onControlNextClick]');
-    this.next();
-  },
-  
-  onControlProgressMouseDown: function(e) {
-    this.debug('[event: onControlProgressMouseDown]');
-    
-    var self = this;
-    
-    if ( this.video[0].paused ) {
-      this.videoWasPlaying = false;
-    } else {
-      this.videoWasPlaying = true;
-      this.video[0].pause();
-    }
-    
-    this._blockTextSelection();
-    
-    $(document).bind('mousemove', this.setPlayProgressWithEvent().context(this));
-    
-    $(document).bind('mouseup', function(){
-      self._unblockTextSelection();
-      $(document).unbind('mousemove mouseup');
-      if ( this.videoWasPlaying ) {
-        this.video[0].play();
-        this.trackPlayProgress()
-      }
-    });
-  },
-  
-  onControlProgressMouseUp: function(e) {
-    this.debug('[event: onControlProgressMouseUp]');
-  },
-  
-  onControlVolumeMouseDown: function(e) {
-    this.debug('[event: onControlVolumeMouseDown]');
-  },
-  
-  onControlVolumeMouseUp: function(e) {
-    this.debug('[event: onControlVolumeMouseUp]');
-  },
-  
-  onControlFullscreenClick: function(e) {
-    this.debug('[event: onControlFullscreenClick]');
-  },
-  
-  onControlContainerMouseMove: function(e) {
-    //this.debug('[event: onControlContainerMouseMove]');
-    this._controllerShow();
-    this._controllerHide(true);
-  },
-  
-  onControlContainerMouseLeave: function(e) {
-    //this.debug('[event: onControlContainerMouseLeave]');
-    this.hideController(true);
-  },
-  
-  onControlControllerMouseEnter: function(e) {
-    //this.debug('[event: onControlControllerMouseEnter]');
-    this.onController = true;
-  },
-  
-  onControlControllerMouseLeave: function(e) {
-    //this.debug('[event: onControlControllerMouseLeave]');
-    this.onController = false;
   }
 };
 
