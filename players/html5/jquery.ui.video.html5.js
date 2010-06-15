@@ -49,9 +49,14 @@ $.ui.video.html5 = {
     visible ? this._controllerShow() : this._controllerHide();
     return this.element;
   },
+  fullscreen: function(visible) {
+    
+  },
   
   // Private methods.
   _playerBuild: function() {
+    this.videoIsFullscreen = false;
+    
     this.container = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-container').appendTo(this.container);
     this.video = $('<video></video>').attr({ width: this.options.width, height: this.options.height }).appendTo(this.container);
     this.loader = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-loader').appendTo(this.container);
@@ -77,7 +82,7 @@ $.ui.video.html5 = {
     this.video[0].addEventListener('error', this.onError.context(this), false);
     
     // Control Events.
-    this.video.bind('mouseup', this.onControllerPlay.context(this));
+    this.video.bind('click', this.onControllerPlay.context(this));
     this.container.bind('mousemove', this.onControllerShow.context(this));
     this.container.bind('mouseleave', this.onControllerHide.context(this));
     this.controller.bind('mouseenter', this.onControllerOver.context(this));
@@ -163,6 +168,18 @@ $.ui.video.html5 = {
     var parts = src.split('?')[0].split('.');
     return parts[parts.length - 1];
   },
+  _fullscreen: function(visible) {
+    if ( this.videoIsFullscreen = visible ) {
+      this.videoOverflow = document.documentElement.style.overflow = 'hidden';
+      this.container.addClass('video-fullscreen');
+    } else {
+      document.documentElement.style.overflow = this.videoOverflow;
+      this.container.removeClass('video-fullscreen');
+    }
+    
+    this._controllerPosition();
+    this._posterPosition();
+  },
   _playlistInit: function() {
     if ( this.video[0].src == '' ) {
       this.video[0].src = this._fileGet(this.playlist[0].url);
@@ -208,6 +225,27 @@ $.ui.video.html5 = {
     if ( this.error.is(':visible') )
       this.error.fadeOut();
   },
+  _volumeSet: function(level) {
+    this.debug('[set volume level - ' + level + ']');
+    this.video[0].volume = localStorage['volume'] = level;
+  },
+  _textSelectionBlock: function() {
+    document.body.focus();
+    document.onselectstart = function () { return false; };
+  },
+  _textSelectionUnblock: function() {
+    document.onselectstart = function () { return true; };
+  },
+  _positionRelative: function(x, relativeElement) {
+    return Math.max(0, Math.min(1, (x - this._positionFindX(relativeElement[0])) / relativeElement[0].offsetWidth));
+  },
+  _positionFindX: function(obj) {
+    var curleft = obj.offsetLeft;
+    while(obj = obj.offsetParent) {
+      curleft += obj.offsetLeft;
+    }
+    return curleft;
+  },
   
   // Controller events.
   onControllerPlay: function(e) {
@@ -228,14 +266,29 @@ $.ui.video.html5 = {
   onControllerScrubberStop: function(e) {
     this.debug('[event controller: onControllerScrubberStop]');
   },
+  onControllerVolume: function(e) {
+    //this.debug('[event controller: onControllerVolume]');
+    this._volumeSet(this._positionRelative(e.pageX, this.control.volume));
+  },
   onControllerVolumeStart: function(e) {
-    this.debug('[event controller: onControllerVolumeStart]');
+    //this.debug('[event controller: onControllerVolumeStart]');
+    
+    var self = this;
+    
+    this._textSelectionBlock();
+    $(document).bind('mousemove', this.onControllerVolume.context(this));
+    $(document).bind('mouseup', function(){ 
+      this._textSelectionUnblock();
+      $(document).unbind('mousemove mouseup');
+    }.context(this));
   },
   onControllerVolumeStop: function(e) {
-    this.debug('[event controller: onControllerVolumeStop]');
+    //this.debug('[event controller: onControllerVolumeStop]');
+    this.onControllerVolume(e);
   },
   onControllerFullscreen: function(e) {
     this.debug('[event controller: onControllerFullscreen]');
+    this._fullscreen( !this.videoIsFullscreen );
   },
   onControllerShow: function(e) {
     //this.debug('[event controller: onControllerShow]');
@@ -276,7 +329,11 @@ $.ui.video.html5 = {
     this.playlist[this.current + 1] !== undefined ? this.next() : this.current = 0;
   },
   onVolumeChange: function(e) {
-    this.debug('[event player: onVolumeChange]');
+    //this.debug('[event player: onVolumeChange]');
+    var volume = Math.floor(this.video[0].volume * 6);
+    for ( var i = 0; i < 6; i++ ) {
+      
+    }
   },
   onLoadStart: function(e) {
     this.debug('[event player: onLoadStart]');
@@ -296,84 +353,6 @@ $.ui.video.html5 = {
   onError: function(e) {
     this.debug('[event player: onError]');
     this._errorShow(this.video[0].error);
-  },
-  
-  // Old functions.
-  sizeProgressBar: function() {
-    
-  },
-  playProgressSet: function() {
-    
-  },
-  playProgressSetWithEvent: function() {
-    
-  },
-  playProgressTrack: function() {
-    
-  },
-  playProgressUntrack: function() {
-    
-  },
-  playProgressUpdate: function() {
-    
-  },
-  updateTimeDisplay: function() {
-    
-  },
-  setVolume: function() {
-    
-  },
-  setVolumeWithEvent: function() {
-    
-  },
-  updateVolumeDisplay: function() {
-  
-  },
-  fullscreenOn: function() {
-  
-  },
-  fullscreenOff: function() {
-  
-  },
-  blockTextSelection: function() {
-    
-  },
-  unblockTextSelection: function() {
-    
-  },
-  formatTime: function(seconds) {
-    
-  },
-  getRelativePosition: function(x, relativeElement) {
-    
-  },
-  findPosX: function(obj) {
-    
-  },
-  getFile: function(src) {
-    if ( this.codec == null ) {
-      for ( var i in this.codecs ) {
-        if ( this.video[0].canPlayType(this.codecs[i]) && this.codec == null ) {
-          this.codec = i;
-        }
-      }  
-    }
-    
-    return src.replace('.' + this.getFileType(src), '.' + this.codec);
-  },
-  getFileType: function(src) {
-    var parts = src.split('?')[0].split('.');
-    return parts[parts.length - 1];
-  },
-  loadPlaylist: function() {
-    
-  },
-  _blockTextSelection: function() {
-    document.body.focus();
-    document.onselectstart = function () { return false; };
-  },
-  _unblockTextSelection: function() {
-    document.onselectstart = function () { return true; };
   }
 };
 
@@ -382,7 +361,7 @@ Function.prototype.context = function(obj) {
   temp = function() {
     return method.apply(obj, arguments)
   }
- return temp
+  return temp
 }
 
 })(jQuery);
