@@ -1,47 +1,49 @@
 .video-container {
   position: relative;
-  border: 1px solid #333;
-  font-family: "Lucida Grande", arial, helvetica, sans-serif;
+  font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+  
+  /* Shadows */
+  -webkit-box-shadow: 0 0 20px #000;
+  -moz-box-shadow: 0 0 20px #000;
 }
 
 .video-container video {
   background: #fff;
 }
 
-.video-fullscreen {
+.video-container.video-fullscreen {
   position: fixed;
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 100% ! important;
-  height: 100% ! important;
   overflow: hidden;
 }
 
-.video-fullscreen video {
+.video-container.video-fullscreen video {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100% ! important;
-  height: 100% ! important;
 }
 
-.video-loader {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: #fff url(loader-white.gif) center center no-repeat;
-}
-
+.video-loader,
 .video-error {
   display: none;
   position: absolute;
   top: 0;
   left: 0;
-  background: #fff url(error.png) 50% 20px no-repeat;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-position: center center;
   text-align: center;
+}
+
+.video-loader {
+  background-image: url(loader-white.gif);
+}
+
+.video-error {
+  background-image: url(error.png);
 }
 
 .video-error span {
@@ -49,18 +51,16 @@
   padding: 260px 10em 0 10em;
 }
 
+/***** Controller *****/
 .video-controller {
   position: absolute;
   bottom: 0;
   left: 0;
-}
-
-.video-controller {
   margin: 0;
   padding: 0;
 }
 
-.video-controller li {
+.xvideo-controller li {
   float: left;
   width: 25px;
   height: 24px;
@@ -78,11 +78,11 @@
   background: -moz-linear-gradient(top,  #222,  #000);
 }
 
-.video-control-scrubber {
+.xvideo-control-scrubber {
   position: relative;
 }
 
-.video-control-scrubber .video-control-bar {
+.xvideo-control-scrubber .video-control-bar {
   display: block;
   position: absolute;
   top: 7px;
@@ -95,7 +95,7 @@
   background: -moz-linear-gradient(top,  #dadada,  #ffff);
 }
 
-.video-control-scrubber-total {
+.xvideo-control-scrubber-total {
   width: 375px;
   background-color: #808080;
 }

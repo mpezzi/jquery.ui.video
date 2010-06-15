@@ -87,14 +87,14 @@ $.ui.video.html5 = {
     this.container.bind('mouseleave', this.onControllerHide.context(this));
     this.controller.bind('mouseenter', this.onControllerOver.context(this));
     this.controller.bind('mouseleave', this.onControllerOut.context(this));
-    this.control.play.bind('mouseup', this.onControllerPlay.context(this));
-    this.control.prev.bind('mouseup', this.onControllerPrev.context(this));
-    this.control.next.bind('mouseup', this.onControllerNext.context(this));
-    this.control.scrubber.bind('mousedown', this.onControllerScrubberStart.context(this));
-    this.control.scrubber.bind('mouseup', this.onControllerScrubberStop.context(this));
-    this.control.volume.bind('mousedown', this.onControllerVolumeStart.context(this));
-    this.control.volume.bind('mouseup', this.onControllerVolumeStop.context(this));
-    this.control.fullscreen.bind('mouseup', this.onControllerFullscreen.context(this));
+    this.controls.play.bind('mouseup', this.onControllerPlay.context(this));
+    this.controls.prev.bind('mouseup', this.onControllerPrev.context(this));
+    this.controls.next.bind('mouseup', this.onControllerNext.context(this));
+    this.controls.progress.bind('mousedown', this.onControllerScrubberStart.context(this));
+    this.controls.progress.bind('mouseup', this.onControllerScrubberStop.context(this));
+    this.controls.volume.bind('mousedown', this.onControllerVolumeStart.context(this));
+    this.controls.volume.bind('mouseup', this.onControllerVolumeStop.context(this));
+    this.controls.fullscreen.bind('mouseup', this.onControllerFullscreen.context(this));
     
     // Initialize playlist.
     if ( this.options.autoplay )
@@ -107,31 +107,30 @@ $.ui.video.html5 = {
     this.controller = $('<ul>').hide().width(this.options.width).addClass('video-controller').appendTo(this.container);
     
     // Build control elements.
-    this.control = {
-      play: $('<li></li>').attr('title', 'Play').addClass('video-control-button video-control-play').appendTo(this.controller),
-      prev: $('<li></li>').hide().attr('title', 'Previous').addClass('video-control-button video-control-prev').appendTo(this.controller),
-      next: $('<li></li>').hide().attr('title', 'Next').addClass('video-control-button video-control-next').appendTo(this.controller),
-      scrubber: $('<li></li>').addClass('video-control-scrubber').appendTo(this.controller),
-      progress: $('<span></span>').addClass('video-control-bar video-control-scrubber-progress'),
-      buffer: $('<span></span>').addClass('video-control-bar video-control-scrubber-buffer'),
-      total: $('<span></span>').addClass('video-control-bar video-control-scrubber-total'),
-      time: $('<span></span>').addClass('video-control-bar video-control-scrubber-time'),
-      volume: $('<li></li>').attr('title', 'Volume').addClass('video-control-volume').appendTo(this.controller),
-      fullscreen: $('<li></li>').attr('title', 'Fullscreen').addClass('video-control-button video-control-fullscreen').appendTo(this.controller)
+    this.controls = {
+      play: $('<li class="video-control-button video-control-play">Play</li>').attr('title', 'Play').appendTo(this.controller),
+      prev: $('<li class="video-control-button video-control-prev">Previous</li>').attr('title', 'Previous').hide().appendTo(this.controller),
+      next: $('<li class="video-control-button video-control-next">Next</li>').attr('title', 'Next').hide().appendTo(this.controller),
+      progress: $('<li class="video-control-progress"><ul></ul></li>').appendTo(this.controller),
+      position: $('<li class="video-control-position"></li>'),
+      buffer: $('<li class="video-control-buffer"></li>'),
+      time: $('<li class="video-control-time"></li>'),
+      volume: $('<li class="video-control-volume"></li>').attr('title', 'Volume').appendTo(this.controller),
+      fullscreen: $('<li class="video-control-button video-control-fullscreen">Fullscreen</li>').attr('title', 'Fullscreen').appendTo(this.controller)
     };
     
-    // Add progress elements to scrubber.
-    $([this.control.progress, this.control.buffer, this.control.total]).appendTo(this.control.scrubber);
+    // Add progress elements to progress container.
+    $([this.controls.position, this.controls.buffer, this.controls.total]).appendTo(this.controls.progress);
     
     // Show playlist buttons.
     if ( this.playlist.length > 1 ) {
-      this.control.prev.show();
-      this.control.next.show();
+      this.controls.prev.show();
+      this.controls.next.show();
     }
   },
   _controllerPosition: function() {
     scrubber = ( this.playlist.length > 1 ) ? 172 : 108;
-    this.control.scrubber.width(this.options.width - scrubber);
+    this.controls.progress.width(this.options.width - scrubber);
   },
   _controllerShow: function() {
     if ( this.controller.is(':visible') ) return;
