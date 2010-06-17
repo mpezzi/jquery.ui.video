@@ -58,7 +58,7 @@ $.ui.video.html5 = {
     this.videoIsFullscreen = false;
     
     this.container = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-container').appendTo(this.container);
-    this.video = $('<video></video>').attr({ width: this.options.width, height: this.options.height }).appendTo(this.container);
+    this.video = $('<video></video>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
     this.loader = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-loader').appendTo(this.container);
     this.error = $('<div><span></span></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-error').appendTo(this.container);
     
@@ -96,15 +96,45 @@ $.ui.video.html5 = {
     this.controls.volume.bind('mouseup', this.onControllerVolumeStop.context(this));
     this.controls.fullscreen.bind('mouseup', this.onControllerFullscreen.context(this));
     
+    // Document Events.
+    $(window).resize(this.onResize.context(this));
+    
     // Initialize playlist.
     if ( this.options.autoplay )
       this._playlistInit();
+  },
+  _playerPosition: function() {
+    var width = this.options.width;
+    var height = this.options.height;
+    
+    if ( this.videoIsFullscreen ) {
+      width = $(document).width();
+      height = $(document).height();
+    }
+    
+    this.container.width(width).height(height);
+    this.video.width(width).height(height);
+    this.loader.width(width).height(height);
+    this.error.width(width).height(height);
+  },
+  _playerFullscreen: function(visible) {
+    if ( this.videoIsFullscreen = visible ) {
+      this.videoOverflow = document.documentElement.style.overflow = 'hidden';
+      this.container.addClass('video-fullscreen');
+    } else {
+      document.documentElement.style.overflow = this.videoOverflow;
+      this.container.removeClass('video-fullscreen');
+    }
+    
+    this._playerPosition();
+    this._controllerPosition();
+    this._posterPosition();
   },
   _controllerBuild: function() {
     this.onController = false;
     
     // Build controller.
-    this.controller = $('<ul>').hide().width(this.options.width).addClass('video-controller').appendTo(this.container);
+    this.controller = $('<ul class="video-controller">').hide().appendTo(this.container);
     
     // Build control elements.
     this.controls = {
@@ -114,13 +144,13 @@ $.ui.video.html5 = {
       progress: $('<li class="video-control-progress"><ul></ul></li>').appendTo(this.controller),
       position: $('<li class="video-control-position"></li>'),
       buffer: $('<li class="video-control-buffer"></li>'),
-      time: $('<li class="video-control-time"></li>'),
+      time: $('<li class="video-control-time"></li>').appendTo(this.controller),
       volume: $('<li class="video-control-volume"></li>').attr('title', 'Volume').appendTo(this.controller),
       fullscreen: $('<li class="video-control-button video-control-fullscreen">Fullscreen</li>').attr('title', 'Fullscreen').appendTo(this.controller)
     };
     
     // Add progress elements to progress container.
-    $([this.controls.position, this.controls.buffer, this.controls.total]).appendTo(this.controls.progress);
+    $([this.controls.buffer, this.controls.position]).appendTo(this.controls.progress.find('ul'));
     
     // Show playlist buttons.
     if ( this.playlist.length > 1 ) {
@@ -129,8 +159,7 @@ $.ui.video.html5 = {
     }
   },
   _controllerPosition: function() {
-    scrubber = ( this.playlist.length > 1 ) ? 172 : 108;
-    this.controls.progress.width(this.options.width - scrubber);
+    this.controller.css('left', ( this.video.width() / 2 ) - ( this.controller.width() / 2 ) + 'px');
   },
   _controllerShow: function() {
     if ( this.controller.is(':visible') ) return;
@@ -149,8 +178,38 @@ $.ui.video.html5 = {
         }.context(this), 4000);  
       }
     } else {
-      this.controller.fadeOut();
+      //this.controller.fadeOut();
     }
+  },
+  _controllerProgressStart: function() {
+    this._controllerProgressInterval = setInterval(function(){
+      this._controllerProgressUpdate();
+    }.context(this), 33);
+  },
+  _controllerProgressStop: function() {
+    clearInterval(this._controllerProgressInterval);
+  },
+  _controllerProgressUpdate: function() {
+    if ( this.controller.is(':hidden') ) return;
+    this.controls.position.css({ width: this._positionPercentage(this.video[0].currentTime, this.video[0].duration) + '%' });
+  },
+  _controllerBufferStart: function() {
+    this._controllerBufferInterval = setInterval(function(){
+      this._controllerBufferUpdate();
+    }.context(this), 33);
+  },
+  _controllerBufferStop: function() {
+    clearInterval(this._controllerBufferInterval);
+  },
+  _controllerBufferUpdate: function() {
+    if ( this.controller.is(':hidden') ) return;
+    
+    var buffered = this._positionPercentage(this.video[0].buffered, this.video[0].duration);
+    
+    this.controls.buffer.css({ width: buffered + '%' });
+    
+    if ( buffered >= 100 )
+      this._controllerBufferStop();
   },
   _fileGet: function(src) {
     if ( this.codec == null ) {
@@ -166,18 +225,6 @@ $.ui.video.html5 = {
   _fileGetExtension: function(src) {
     var parts = src.split('?')[0].split('.');
     return parts[parts.length - 1];
-  },
-  _fullscreen: function(visible) {
-    if ( this.videoIsFullscreen = visible ) {
-      this.videoOverflow = document.documentElement.style.overflow = 'hidden';
-      this.container.addClass('video-fullscreen');
-    } else {
-      document.documentElement.style.overflow = this.videoOverflow;
-      this.container.removeClass('video-fullscreen');
-    }
-    
-    this._controllerPosition();
-    this._posterPosition();
   },
   _playlistInit: function() {
     if ( this.video[0].src == '' ) {
@@ -245,6 +292,10 @@ $.ui.video.html5 = {
     }
     return curleft;
   },
+  _positionPercentage: function(x, y) {
+    var percentage = ( x / y ) * 100;
+    return ( percentage <= 100 ) ? percentage : 100;
+  },
   
   // Controller events.
   onControllerPlay: function(e) {
@@ -287,7 +338,7 @@ $.ui.video.html5 = {
   },
   onControllerFullscreen: function(e) {
     this.debug('[event controller: onControllerFullscreen]');
-    this._fullscreen( !this.videoIsFullscreen );
+    this._playerFullscreen( !this.videoIsFullscreen );
   },
   onControllerShow: function(e) {
     //this.debug('[event controller: onControllerShow]');
@@ -316,9 +367,11 @@ $.ui.video.html5 = {
     this.debug('[event player: onPlaying]');
     this._loaderHide();
     this._errorHide();
+    this._controllerProgressStart();
   },
   onPause: function(e) {
     this.debug('[event player: onPause]');
+    this._controllerProgressStop();
   },
   onSeek: function(e) {
     this.debug('[event player: onSeek]');
@@ -326,6 +379,8 @@ $.ui.video.html5 = {
   onEnded: function(e) {
     this.debug('[event player: onEnded]');
     this.playlist[this.current + 1] !== undefined ? this.next() : this.current = 0;
+    this._controllerBufferStop();
+    this._controllerProgressStop();
   },
   onVolumeChange: function(e) {
     //this.debug('[event player: onVolumeChange]');
@@ -336,6 +391,7 @@ $.ui.video.html5 = {
   },
   onLoadStart: function(e) {
     this.debug('[event player: onLoadStart]');
+    this._controllerBufferStart();
   },
   onLoadedData: function(e) {
     this.debug('[event player: onLoadedData]');
@@ -343,15 +399,25 @@ $.ui.video.html5 = {
   onStalled: function(e) {
     this.debug('[event player: onStalled]');
     this._loaderShow();
+    this._controllerProgressStop();
   },
   onWaiting: function(e) {
     this.debug('[event player: onWaiting]');
     this._errorHide();
     this._loaderShow();
+    this._controllerProgressStop();
   },
   onError: function(e) {
     this.debug('[event player: onError]');
+    this._controllerBufferStop();
     this._errorShow(this.video[0].error);
+  },
+  onResize: function(e) {
+    if ( this.videoIsFullscreen ) {
+      this._playerPosition();
+      this._controllerPosition();
+    }
+    
   }
 };
 
