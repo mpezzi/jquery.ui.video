@@ -45,6 +45,12 @@ $.ui.video.html5 = {
   next: function() {
     this.play(this.current + 1);
   },
+  finished: function() {
+    this.debug('[finished]');
+    this.debug(this.video);
+    this.video[0].src = '';
+    this.current = 0;
+  },
   controller: function(visible) {
     visible ? this._controllerShow() : this._controllerHide();
     return this.element;
@@ -178,8 +184,11 @@ $.ui.video.html5 = {
         }.context(this), 4000);  
       }
     } else {
-      //this.controller.fadeOut();
+      this.controller.fadeOut();
     }
+  },
+  _controllerProgressSet: function(progress) {
+    this.video[0].currentTime = Math.floor( ( progress / 100 ) * this.video[0].duration );
   },
   _controllerProgressStart: function() {
     this._controllerProgressInterval = setInterval(function(){
@@ -234,7 +243,7 @@ $.ui.video.html5 = {
     }
   },
   _posterBuild: function() {
-    this.video.attr('poster', this._buildPoster);
+    this.video.attr('poster', this._buildPoster());
   },
   _posterPosition: function() {
     
@@ -294,7 +303,7 @@ $.ui.video.html5 = {
   },
   _positionPercentage: function(x, y) {
     var percentage = ( x / y ) * 100;
-    return ( percentage <= 100 ) ? percentage : 100;
+    return ( percentage <= 100 && percentage >=0 ) ? percentage : 0;
   },
   
   // Controller events.
@@ -312,9 +321,21 @@ $.ui.video.html5 = {
   },
   onControllerScrubberStart: function(e) {
     this.debug('[event controller: onControllerScrubberStart]');
+    this._textSelectionBlock();
+    this._controllerProgressSet(this._positionPercentage(e.offsetX, this.controls.progress.find('ul').width()));
+    this.controller.css('cursor', 'pointer');
+    this.controls.progress.bind('mousemove', this.onControllerScrubberTrack.context(this));
+    this.videoIsSeeking = true;
+  },
+  onControllerScrubberTrack: function(e) {
+    this._controllerProgressSet(this._positionPercentage(e.offsetX, this.controls.progress.find('ul').width()));
   },
   onControllerScrubberStop: function(e) {
     this.debug('[event controller: onControllerScrubberStop]');
+    this._textSelectionUnblock();
+    this.controller.css('cursor', 'default');
+    this.controls.progress.unbind('mousemove');
+    this.videoIsSeeking = false;
   },
   onControllerVolume: function(e) {
     //this.debug('[event controller: onControllerVolume]');
@@ -365,20 +386,21 @@ $.ui.video.html5 = {
   },
   onPlaying: function(e) {
     this.debug('[event player: onPlaying]');
-    this._loaderHide();
-    this._errorHide();
-    this._controllerProgressStart();
+    if ( !this.videoIsSeeking ) {
+      this._loaderHide();
+      this._errorHide();
+      this._controllerProgressStart();
+    }
   },
   onPause: function(e) {
     this.debug('[event player: onPause]');
-    this._controllerProgressStop();
   },
   onSeek: function(e) {
-    this.debug('[event player: onSeek]');
+    //this.debug('[event player: onSeek]');
   },
   onEnded: function(e) {
     this.debug('[event player: onEnded]');
-    this.playlist[this.current + 1] !== undefined ? this.next() : this.current = 0;
+    this.playlist[this.current + 1] !== undefined ? this.next() : this.finished();
     this._controllerBufferStop();
     this._controllerProgressStop();
   },
@@ -403,9 +425,11 @@ $.ui.video.html5 = {
   },
   onWaiting: function(e) {
     this.debug('[event player: onWaiting]');
-    this._errorHide();
-    this._loaderShow();
-    this._controllerProgressStop();
+    if ( !this.videoIsSeeking ) {
+      this._errorHide();
+      this._loaderShow();
+      this._controllerProgressStop();  
+    }
   },
   onError: function(e) {
     this.debug('[event player: onError]');
@@ -417,7 +441,6 @@ $.ui.video.html5 = {
       this._playerPosition();
       this._controllerPosition();
     }
-    
   }
 };
 
