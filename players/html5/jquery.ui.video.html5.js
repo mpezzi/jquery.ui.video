@@ -56,7 +56,7 @@ $.ui.video.html5 = {
     return this.element;
   },
   fullscreen: function(visible) {
-    
+    this._playerFullscreen(visible);
   },
   
   // Private methods.
@@ -104,6 +104,7 @@ $.ui.video.html5 = {
     
     // Document Events.
     $(window).resize(this.onResize.context(this));
+    $(document).bind('keyup', this.onControllerKeyPress.context(this));
     
     // Initialize playlist.
     if ( this.options.autoplay )
@@ -124,6 +125,8 @@ $.ui.video.html5 = {
     this.error.width(width).height(height);
   },
   _playerFullscreen: function(visible) {
+    var self = this;
+    
     if ( this.videoIsFullscreen = visible ) {
       this.videoOverflow = document.documentElement.style.overflow = 'hidden';
       this.container.addClass('video-fullscreen');
@@ -378,11 +381,26 @@ $.ui.video.html5 = {
     this.debug('[event controller: onControllerOut]');
     this.onController = false;
   },
+  onControllerKeyPress: function(e) {
+    this.debug('[event controller: onControllerKeyPress]');
+    //this.debug(e.keyCode);
+    switch ( e.keyCode ) {
+      case 27: if ( this.videoIsFullscreen ) this.controls.fullscreen.trigger('mouseup'); break;
+    }
+  },
   
   // Player events.
   onPlay: function(e) {
     this._playlistInit();
     this.debug('[event player: onPlay] - ' + this.video[0].src);
+    
+    if ( this.playlist[this.current].forced ) {
+      this.controls.prev.hide();
+      this.controls.next.hide();
+    } else {
+      this.controls.prev.show();
+      this.controls.next.show();
+    }
   },
   onPlaying: function(e) {
     this.debug('[event player: onPlaying]');

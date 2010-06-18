@@ -1,6 +1,7 @@
 .video-container {
   position: relative;
   font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+  z-index: 1000;
   
   /* Shadows */
   -webkit-box-shadow: 0 0 20px #000;
@@ -18,6 +19,7 @@
   right: 0;
   bottom: 0;
   overflow: hidden;
+  z-index: 1001;
 }
 
 .video-container.video-fullscreen video {
