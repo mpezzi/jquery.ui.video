@@ -123,52 +123,7 @@
   -moz-border-radius: 2px;
 }
 
-.video-control-progress .video-control-position {
-  width: 50%;
-}
-
 .video-control-progress .video-control-buffer {
-  width: 75%;
   background: -webkit-gradient(linear, left top, left bottom, from(#333), to(#555));
   background: -moz-linear-gradient(top,  #333,  #555);
-}
-
-
-.xvideo-controller li {
-  float: left;
-  width: 25px;
-  height: 24px;
-  margin: 5px 0 5px 5px;
-  border: 1px solid #000;
-  background: #000;
-  color: #fff;
-  list-style: none;
-  opacity: 0.9;
-  cursor: pointer;
-  
-  
-  background: -webkit-gradient(linear, left top, left bottom, from(#222), to(#000));
-  background: -moz-linear-gradient(top,  #222,  #000);
-}
-
-.xvideo-control-scrubber {
-  position: relative;
-}
-
-.xvideo-control-scrubber .video-control-bar {
-  display: block;
-  position: absolute;
-  top: 7px;
-  left: 7px;
-  height: 7px;
-  
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  background: -webkit-gradient(linear, left top, left bottom, from(#dadada), to(#fff));
-  background: -moz-linear-gradient(top,  #dadada,  #ffff);
-}
-
-.xvideo-control-scrubber-total {
-  width: 375px;
-  background-color: #808080;
 }

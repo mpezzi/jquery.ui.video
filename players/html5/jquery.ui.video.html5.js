@@ -129,15 +129,15 @@ $.ui.video.html5 = {
     
     if ( this.videoIsFullscreen = visible ) {
       this.videoOverflow = document.documentElement.style.overflow = 'hidden';
+      this.container.animate({ width: $(document).width(), height: $(document).height() }, 1000);
+      this.video.animate({ width: $(document).width(), height: $(document).height() }, 1000, this._position.context(this));
       this.container.addClass('video-fullscreen');
     } else {
       document.documentElement.style.overflow = this.videoOverflow;
+      this.container.animate({ width: this.options.width, height: this.options.height }, 1000);
+      this.video.animate({ width: this.options.width, height: this.options.height }, 1000, this._position.context(this));
       this.container.removeClass('video-fullscreen');
     }
-    
-    this._playerPosition();
-    this._controllerPosition();
-    this._posterPosition();
   },
   _controllerBuild: function() {
     this.onController = false;
@@ -294,6 +294,11 @@ $.ui.video.html5 = {
   _textSelectionUnblock: function() {
     document.onselectstart = function () { return true; };
   },
+  _position: function() {
+    this._playerPosition();
+    this._controllerPosition();
+    this._posterPosition();
+  },
   _positionRelative: function(x, relativeElement) {
     return Math.max(0, Math.min(1, (x - this._positionFindX(relativeElement[0])) / relativeElement[0].offsetWidth));
   },
@@ -394,12 +399,16 @@ $.ui.video.html5 = {
     this._playlistInit();
     this.debug('[event player: onPlay] - ' + this.video[0].src);
     
+    this.controls.play.text('Play');
+    
     if ( this.playlist[this.current].forced ) {
-      this.controls.prev.hide();
-      this.controls.next.hide();
+      this.controls.prev.fadeOut();
+      this.controls.next.fadeOut();
+      this.controls.progress.fadeOut();
     } else {
-      this.controls.prev.show();
-      this.controls.next.show();
+      this.controls.prev.fadeIn();
+      this.controls.next.fadeIn();
+      this.controls.progress.fadeIn();
     }
   },
   onPlaying: function(e) {
@@ -412,6 +421,7 @@ $.ui.video.html5 = {
   },
   onPause: function(e) {
     this.debug('[event player: onPause]');
+    this.controls.play.text('Pause');
   },
   onSeek: function(e) {
     //this.debug('[event player: onSeek]');
@@ -459,7 +469,7 @@ $.ui.video.html5 = {
       this._playerPosition();
       this._controllerPosition();
     }
-  }
+  } 
 };
 
 Function.prototype.context = function(obj) {
