@@ -63,10 +63,10 @@ $.ui.video.html5 = {
   _playerBuild: function() {
     this.videoIsFullscreen = false;
     
-    this.container = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-container').appendTo(this.container);
-    this.video = $('<video></video>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
-    this.loader = $('<div></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-loader').appendTo(this.container);
-    this.error = $('<div><span></span></div>').css({ width: this.options.width, height: this.options.height }).addClass('video-error').appendTo(this.container);
+    this.container = $('<div class="video-container video-window"></div>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
+    this.video = $('<video class="video-window"></video>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
+    this.loader = $('<div class="video-loader video-window"></div>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
+    this.error = $('<div class="video-error video-window"><span></span></div>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
     
     this.options.autoplay ? this.video.attr('autoplay', 'autoplay') : false;
     this.options.preload ? this.video.attr('preload', 'preload') : false;
@@ -111,44 +111,45 @@ $.ui.video.html5 = {
       this._playlistInit();
   },
   _playerPosition: function() {
-    // var width = this.options.width;
-    //     var height = this.options.height;
-    //     
-    //     if ( this.videoIsFullscreen ) {
-    //       width = $(document).width();
-    //       height = $(document).height();
-    //     }
-    //     
-    //     this.container.width(width).height(height);
-    //     this.video.width(width).height(height);
-    //     this.loader.width(width).height(height);
-    //     this.error.width(width).height(height);
+    var width = this.videoIsFullscreen ? $(document).width() : this.options.width,
+        height = this.videoIsFullscreen ? $(document).height() : this.options.height;
+    
+    this.container.width(width).height(height);
+    this.video.width(width).height(height);
+    this.loader.width(width).height(height);
+    this.error.width(width).height(height);
   },
   _playerFullscreen: function(visible) {
     if ( this.videoIsFullscreen = visible ) {
-      
+      this.documentOverflow = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = 'hidden';
+      this.containerOffset = this.container.parent().offset();
+      this.controller.fadeOut(250, function(){
+        this.video.animate({ width: $(document).width(), height: $(document).height() }, 1000, 'easeInQuart');
+        this.container.addClass('video-fullscreen')
+              .css({ top: this.containerOffset.top + 'px', left: this.containerOffset.left + 'px' })
+              .animate({ width: $(document).width(), height: $(document).height(), top: 0, left: 0 }, 1000, 'easeInQuart', function(){
+                this._playerPosition();
+                this._controllerPosition();
+              }.context(this));
+      }.context(this));
     } else {
-      
+      this.controller.fadeOut(250, function(){
+        this.containerOffset = this.container.parent().offset();
+        this.video.animate({ width: this.options.width, height: this.options.height }, 1500, 'easeOutQuart');
+        this.container.animate({
+          width: this.options.width + 'px',
+          height: this.options.height + 'px',
+          top: this.containerOffset.top + 'px',
+          left: this.containerOffset.left + 'px'
+        }, 1500, 'easeOutQuart', function(){
+          this.container.removeClass('video-fullscreen').css({ top: 0, left: 0 });
+          document.documentElement.style.overflow = this.documentOverflow;
+          this._playerPosition();
+          this._controllerPosition();
+        }.context(this));
+      }.context(this));
     }
-    
-    
-    
-    // if ( this.videoIsFullscreen = visible ) {
-    //       this.videoContainerOrigPosition = this.container.position();
-    //       this.container.animate({ 
-    //         width: $(document).width(),
-    //         height: $(document).height(),
-    //         top: (this.videoContainerOrigPosition.top * -1),
-    //         left: (this.videoContainerOrigPosition.left * -1)
-    //       }, 500);
-    //       this.video.animate({ width: $(document).width(), height: $(document).height(), top: 0, left: 0 }, 500, this._position.context(this));
-    //       this.container.addClass('video-fullscreen');
-    //     } else {
-    //       this.container.animate({ width: this.options.width, height: this.options.height, top: 0, left: 0 }, 500, function(){
-    //         this.container.removeClass('video-fullscreen');  
-    //       }.context(this));
-    //       this.video.animate({ width: this.options.width, height: this.options.height }, 500, this._position.context(this));
-    //     }
   },
   _controllerBuild: function() {
     this.onController = false;

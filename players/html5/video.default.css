@@ -1,5 +1,9 @@
-.video-container {
+.ui-video {
   position: relative;
+}
+
+.video-container {
+  position: absolute;
   font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
   overflow: hidden;
   z-index: 1000;
@@ -14,6 +18,7 @@
 }
 
 .video-container.video-fullscreen {
+  position: fixed;
   background: #000;
   z-index: 1001;
 }
