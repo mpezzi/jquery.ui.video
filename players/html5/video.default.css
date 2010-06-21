@@ -5,6 +5,7 @@
 .video-container {
   position: absolute;
   font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+  background-color: #fff;
   overflow: hidden;
   z-index: 1000;
   

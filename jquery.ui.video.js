@@ -33,6 +33,8 @@
           // Video Container.
           uiVideoContainer = $('<div></div>')
             .addClass('ui-video')
+            .width(this.options.width)
+            .height(this.options.height)
             .insertAfter(self.element);
       
       self.element.css({

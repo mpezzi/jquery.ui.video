@@ -62,6 +62,7 @@ $.ui.video.html5 = {
   // Private methods.
   _playerBuild: function() {
     this.videoIsFullscreen = false;
+    this.videoTransitionToFullscreen = false;
     
     this.container = $('<div class="video-container video-window"></div>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
     this.video = $('<video class="video-window"></video>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
@@ -123,17 +124,21 @@ $.ui.video.html5 = {
     if ( this.videoIsFullscreen = visible ) {
       this.documentOverflow = document.documentElement.style.overflow;
       document.documentElement.style.overflow = 'hidden';
+      this.videoTransitionToFullscreen = true;
       this.containerOffset = this.container.parent().offset();
       this.controller.fadeOut(250, function(){
         this.video.animate({ width: $(document).width(), height: $(document).height() }, 1000, 'easeInQuart');
         this.container.addClass('video-fullscreen')
               .css({ top: this.containerOffset.top + 'px', left: this.containerOffset.left + 'px' })
               .animate({ width: $(document).width(), height: $(document).height(), top: 0, left: 0 }, 1000, 'easeInQuart', function(){
+                this.videoTransitionToFullscreen = false;
                 this._playerPosition();
                 this._controllerPosition();
+                this._controllerShow();
               }.context(this));
       }.context(this));
     } else {
+      this.videoTransitionToFullscreen = true;
       this.controller.fadeOut(250, function(){
         this.containerOffset = this.container.parent().offset();
         this.video.animate({ width: this.options.width, height: this.options.height }, 1500, 'easeOutQuart');
@@ -143,10 +148,12 @@ $.ui.video.html5 = {
           top: this.containerOffset.top + 'px',
           left: this.containerOffset.left + 'px'
         }, 1500, 'easeOutQuart', function(){
+          this.videoTransitionToFullscreen = false;
           this.container.removeClass('video-fullscreen').css({ top: 0, left: 0 });
           document.documentElement.style.overflow = this.documentOverflow;
           this._playerPosition();
           this._controllerPosition();
+          this._controllerShow();
         }.context(this));
       }.context(this));
     }
@@ -183,7 +190,7 @@ $.ui.video.html5 = {
     this.controller.css('left', ( this.video.width() / 2 ) - ( this.controller.width() / 2 ) + 'px');
   },
   _controllerShow: function() {
-    if ( this.controller.is(':visible') ) return;
+    if ( this.controller.is(':visible') || this.videoTransitionToFullscreen ) return;
     
     this._controllerPosition();
     this.controller.fadeIn();
@@ -348,7 +355,9 @@ $.ui.video.html5 = {
     this.videoIsSeeking = true;
   },
   onControllerScrubberTrack: function(e) {
-    this._controllerProgressSet(this._positionPercentage(e.offsetX, this.controls.progress.find('ul').width()));
+    //this.debug(e.layerX);
+    //this.debug(this._positionPercentage(e.offsetX, this.controls.progress.find('ul').width()));
+    this._controllerProgressSet(this._positionPercentage(e.layerX, this.controls.progress.find('ul').width()));
   },
   onControllerScrubberStop: function(e) {
     this.debug('[event controller: onControllerScrubberStop]');
