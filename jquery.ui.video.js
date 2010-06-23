@@ -26,6 +26,7 @@
       flash: 'flowplayer'
     },
     
+    // Initializer.
     _create: function() {
       var self = this,
           o = self.options,
@@ -57,6 +58,14 @@
       return this;
     },
     
+    // Public methods.
+    play: function(item) {},
+    pause: function() {},
+    stop: function() {},
+    prev: function() {},
+    next: function() {},
+    poster: function() {},
+    
     // Private methods.
     _buildPlayer: function() {
       return ( this.options.player == null ) ?
@@ -64,7 +73,6 @@
           $.ui.video[this.options.html5] : $.ui.video[this.options.flash] :
           $.ui.video[this.options.flash];
     },
-    
     _buildPlaylist: function() {
       var self = this;
       
@@ -85,32 +93,17 @@
         });
       }
     },
-    
-    _buildController: function() {
-      
-    },
-    
     _buildPoster: function() {
       return $('img.poster', this.element).attr('src');
     },
-    
     _buildOptions: function(o) {
       for ( var i in o ) {
         this.options[o[i]] = this.options[o[i]] ? this.options[o[i]] : this.element.hasClass('ui-video-' + o[i]);
       }
     },
-    
     _setOption: function(key, value) {
       
     },
-    
-    // Public methods.
-    play: function(item) {},
-    pause: function() {},
-    stop: function() {},
-    prev: function() {},
-    next: function() {},
-    poster: function() {},
     
     // Debug.
     debug: function(s) {
@@ -120,12 +113,8 @@
   });
   
   $.ui.video.support = {
-    html5: function() {
-      return !!document.createElement('video').canPlayType;
-    },
-    flash: function() {
-      return false;
-    }
+    html5: function() { return !!document.createElement('video').canPlayType; },
+    flash: function() { return false; }
   };
   
 })(jQuery);

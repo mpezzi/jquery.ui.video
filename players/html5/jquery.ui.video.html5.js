@@ -48,6 +48,7 @@ $.ui.video.html5 = {
   finished: function() {
     this.debug('[finished]');
     this.debug(this.video);
+    this.fullscreen(false);
     this.video[0].src = '';
     this.current = 0;
   },
@@ -108,7 +109,7 @@ $.ui.video.html5 = {
     $(document).bind('keyup', this.onControllerKeyPress.context(this));
     
     // Initialize playlist.
-    if ( this.options.autoplay )
+    //if ( this.options.autoplay )
       this._playlistInit();
   },
   _playerPosition: function() {
@@ -258,11 +259,8 @@ $.ui.video.html5 = {
     return parts[parts.length - 1];
   },
   _playlistInit: function() {
-    if ( this.video[0].src == '' ) {
-      this.video[0].src = this._fileGet(this.playlist[0].url);
-      this.video[0].load();
-      this.current = 0;
-    }
+    $('<source>').attr({ src: this._fileGet(this.playlist[0].url), type: this.codecs[this._fileGetExtension(this._fileGet(this.playlist[0].url))] }).appendTo(this.video);
+    this.current = 0;
   },
   _posterBuild: function() {
     this.video.attr('poster', this._buildPoster());
@@ -420,7 +418,7 @@ $.ui.video.html5 = {
     this._playlistInit();
     this.debug('[event player: onPlay] - ' + this.video[0].src);
     
-    this.controls.play.text('Play');
+    this.controls.play.text('Pause');
     
     if ( this.playlist[this.current].forced ) {
       this.controls.prev.fadeOut();
@@ -442,7 +440,7 @@ $.ui.video.html5 = {
   },
   onPause: function(e) {
     this.debug('[event player: onPause]');
-    this.controls.play.text('Pause');
+    this.controls.play.text('Play');
   },
   onSeek: function(e) {
     //this.debug('[event player: onSeek]');
