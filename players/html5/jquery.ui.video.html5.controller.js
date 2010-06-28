@@ -11,10 +11,11 @@
 (function($){
 
 $.ui.video.html5.controller = {
-  isControllerVisible: false,
   isControllerActive: false,
+  isControllerVisible: false,
   
   _controllerBuild: function() {
+    this.debug('[method _controllerBuild]');
     
     // Build controller.
     this.controller = $('<ul class="video-controller">').hide().appendTo(this.container);
@@ -38,9 +39,11 @@ $.ui.video.html5.controller = {
     this._controllerInit();
   },
   _controllerInit: function() {
+    this.debug('[method _controllerInit]');
     
     // Control events.
     this.video.bind('click', this.onControllerPlay.context(this));
+    this.poster.bind('click', this.onControllerPlay.context(this));
     this.container.bind('mousemove', this.onControllerShow.context(this));
     this.container.bind('mouseleave', this.onControllerHide.context(this));
     this.controller.bind('mouseenter', this.onControllerOver.context(this));
@@ -68,9 +71,10 @@ $.ui.video.html5.controller = {
   },
   _controllerShow: function() {
     if ( this.controller.is(':visible') || this.isFullscreenTransition ) return;
-    
+    this.debug('[method _controllerShow]');
     this._controllerPosition();
     this.controller.fadeIn();
+    this.isControllerVisible = true;
   },
   _controllerHide: function(delayed) {
     if ( delayed !== undefined ) {
@@ -81,7 +85,9 @@ $.ui.video.html5.controller = {
         }.context(this), 4000);
       }
     } else {
+      this.debug('[method _controllerHide]');
       this.controller.fadeOut();
+      this.isControllerVisible = false;
     }
   },
   _controllerProgressSet: function(progress) {
@@ -155,7 +161,7 @@ $.ui.video.html5.controller = {
     this._controllerHide(true);
   },
   onControllerHide: function(e) {
-    this._controllerHide(this);
+    this._controllerHide(false);
   },
   onControllerOver: function(e) {
     this.isControllerActive = true;

@@ -55,22 +55,44 @@ $.ui.video.html5 = {
   
   // Private Methods.
   _playerBuild: function() {
+    this.debug('[method _playerBuild]');
+    
+    var dimensions = { width: this.options.width, height: this.options.height };
     
     // Create HTML Video elements.
-    this.container = $('<div class="video-container video-window"></div>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
-    this.video = $('<video class="video-window"></video>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
-    this.loader = $('<div class="video-loader video-window"></div>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
-    this.error = $('<div class="video-error video-window"><span></span></div>').css({ width: this.options.width, height: this.options.height }).appendTo(this.container);
+    this.container = $('<div class="video-container video-window"></div>').css(dimensions).appendTo(this.container);
+    this.video = $('<video class="video-window"></video>').css(dimensions).appendTo(this.container);
+    this.poster = $('<div class="video-poster"></div>').css(dimensions).appendTo(this.container);
+    this.loader = $('<div class="video-loader video-window"></div>').css(dimensions).appendTo(this.container);
+    this.error = $('<div class="video-error video-window"><span></span></div>').css(dimensions).appendTo(this.container);
     
     // Create controller.
     $.extend(this, $.ui.video.html5.controller);
     
-    this._controllerBuild();
+    // Ignore controller and poster for iOS devices.
+    if ( !this._playerIsiOS() ) {
+      this._controllerBuild();
+    }
     
     // Initialize player.
+    this._playerPosterBuild();
     this._playerInit();
   },
   _playerInit: function() {
+    this.debug('[method _playerInit]');
+    
+    // Video Events.
+    this.video[0].addEventListener('loadstart', this.onLoadStart.context(this), false);
+    this.video[0].addEventListener('loadeddata', this.onLoadedData.context(this), false);
+    this.video[0].addEventListener('stalled', this.onStalled.context(this), false);
+    this.video[0].addEventListener('waiting', this.onWaiting.context(this), false);
+    this.video[0].addEventListener('play', this.onPlay.context(this), false);
+    this.video[0].addEventListener('playing', this.onPlaying.context(this), false);
+    this.video[0].addEventListener('pause', this.onPause.context(this), false);
+    this.video[0].addEventListener('seeking', this.onSeeking.context(this), false);
+    this.video[0].addEventListener('ended', this.onEnded.context(this), false);
+    this.video[0].addEventListener('volumechange', this.onVolumeChange.context(this), false);
+    this.video[0].addEventListener('error', this.onError.context(this), false);
     
     // Resize events.
     $(window).resize(this.onResize.context(this));
@@ -89,13 +111,20 @@ $.ui.video.html5 = {
     
   },
   _playerPosterBuild: function() {
-    this.video.attr('poster', this._buildPoster());
+    if ( this._playerIsiOS() ) {
+      this.video.attr('poster', this._buildPoster());
+    } else {
+      this.poster.css({ backgroundImage: 'url('+ this._buildPoster() +')', backgroundRepeat: 'no-repeat' });
+      this.poster.show();
+    }
   },
   _playerPosterShow: function() {
-    
+    if ( !this._playerIsiOS() )
+      this.poster.filter(':hidden').fadeIn(1000);
   },
   _playerPosterHide: function() {
-    
+    if ( !this._playerIsiOS() )
+      this.poster.filter(':visible').fadeOut(1000);
   },
   _playerLoaderShow: function() {
     this.loader.filter(':hidden').fadeIn();
@@ -112,7 +141,7 @@ $.ui.video.html5 = {
       'The video could not be loaded, either because the server or <br />network failed or because the format is not supported.'
     ];
     
-    this.error.find('span').html(messages[e.code] || messages[0]).fadeIn();
+    this.error.filter(':hidden').fadeIn().find('span').html(messages[e.code] || messages[0]);
   },
   _playerErrorHide: function() {
     this.error.filter(':visible').fadeOut();
@@ -144,6 +173,9 @@ $.ui.video.html5 = {
   _playerFinished: function() {
     
   },
+  _playerIsiOS: function() {
+    return ( navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i) );
+  },
   
   // Event listeners.
   onPlay: function(e) {
@@ -160,10 +192,13 @@ $.ui.video.html5 = {
   },
   onFinished: function(e) {
     this.debug('[event onFinished]');
+    this._playerPosterShow();
+    this.load(0);
   },
   onPlaying: function(e) {
     this.debug('[event onPlaying]');
     
+    this._playerPosterHide();
     this._playerLoaderHide();
     this._playerErrorHide();
   },
@@ -172,7 +207,7 @@ $.ui.video.html5 = {
   },
   onWaiting: function(e) {
     this.debug('[event onWaiting]');
-    
+    this._playerLoaderShow();
   },
   onStalled: function(e) {
     this.debug('[event onStalled]');
@@ -181,12 +216,13 @@ $.ui.video.html5 = {
   },
   onError: function(e) {
     this.debug('[event onError]');
+    this._playerLoaderHide();
     this._playerErrorShow(this.video[0].error);
   },
   onResize: function(e) {
     
   },
-  onLoad: function(e) {
+  onLoadStart: function(e) {
     this.debug('[event onLoad]');
     this._controllerProgressBufferStart();
   },
@@ -213,4 +249,3 @@ Function.prototype.context = function(obj) {
 }
 
 })(jQuery);
-

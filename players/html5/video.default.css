@@ -5,17 +5,17 @@
 .video-container {
   position: absolute;
   font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
-  background-color: #000;
+  background-color: #fff;
   overflow: hidden;
   z-index: 1000;
   
   /* Shadows */
-  -webkit-box-shadow: 0 0 20px #000;
-  -moz-box-shadow: 0 0 20px #000;
+/*  -webkit-box-shadow: 0 0 20px #000;
+  -moz-box-shadow: 0 0 20px #000;*/
 }
 
 .video-container video {
-  background: #000;
+  background: #fff;
 }
 
 .video-container.video-fullscreen {
@@ -28,6 +28,7 @@
   background: #000;
 }
 
+.video-poster,
 .video-loader,
 .video-error {
   display: none;
