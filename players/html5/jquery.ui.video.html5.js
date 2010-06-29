@@ -15,7 +15,7 @@ var player = 0;
 $.ui.video.html5 = {
   isFullscreen: false,
   isFullscreenTransition: false,
-  current: null,
+  current: 0,
   codec: null,
   codecs: { mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', ogg: 'video/ogg; codecs="theora, vorbis"', webm: 'video/webm; codecs="vp8, vorbis"' },
   
@@ -70,7 +70,7 @@ $.ui.video.html5 = {
     $.extend(this, $.ui.video.html5.controller);
     
     // Ignore controller and poster for iOS devices.
-    if ( !this._playerIsiOS() ) {
+    if ( !this.isiOS() ) {
       this._controllerBuild();
     }
     
@@ -111,7 +111,7 @@ $.ui.video.html5 = {
     
   },
   _playerPosterBuild: function() {
-    if ( this._playerIsiOS() ) {
+    if ( this.isiOS() ) {
       this.video.attr('poster', this._buildPoster());
     } else {
       this.poster.css({ backgroundImage: 'url('+ this._buildPoster() +')', backgroundRepeat: 'no-repeat' });
@@ -119,11 +119,11 @@ $.ui.video.html5 = {
     }
   },
   _playerPosterShow: function() {
-    if ( !this._playerIsiOS() )
+    if ( !this.isiOS() )
       this.poster.filter(':hidden').fadeIn(1000);
   },
   _playerPosterHide: function() {
-    if ( !this._playerIsiOS() )
+    if ( !this.isiOS() )
       this.poster.filter(':visible').fadeOut(1000);
   },
   _playerLoaderShow: function() {
@@ -172,9 +172,6 @@ $.ui.video.html5 = {
   },
   _playerFinished: function() {
     
-  },
-  _playerIsiOS: function() {
-    return ( navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i) );
   },
   
   // Event listeners.
@@ -237,7 +234,13 @@ $.ui.video.html5 = {
       this._playerPosition();
       this._controllerPosition();
     }
+  },
+  
+  isiOS: function() {
+    return ( navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i) );
   }
+
+
 };
 
 Function.prototype.context = function(obj) {

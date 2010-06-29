@@ -87,7 +87,7 @@
           var item = {};
           
           item.url = $(this).attr('href');
-          item.forced = $(this).hasClass('item-controls-disabled');
+          item.forced = $(this).hasClass('item-forced');
           
           self.playlist[i] = item;
         });

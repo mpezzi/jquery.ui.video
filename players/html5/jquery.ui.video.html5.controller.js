@@ -41,6 +41,13 @@ $.ui.video.html5.controller = {
   _controllerInit: function() {
     this.debug('[method _controllerInit]');
     
+    // Video events.
+    this.video[0].addEventListener('play', this.onVideoPlay.context(this), false);
+    this.video[0].addEventListener('playing', this.onVideoPlaying.context(this), false);
+    this.video[0].addEventListener('pause', this.onVideoPause.context(this), false);
+    this.video[0].addEventListener('loadstart', this.onVideoLoad.context(this), false);
+    this.video[0].addEventListener('loadeddata', this.onVideoLoadedData.context(this), false);
+    
     // Control events.
     this.video.bind('click', this.onControllerPlay.context(this));
     this.poster.bind('click', this.onControllerPlay.context(this));
@@ -106,17 +113,52 @@ $.ui.video.html5.controller = {
     clearInterval(this._controllerProgressPositionInterval);
   },
   _controllerProgressPositionUpdate: function() {
-    if ( this.controller.is(':hidden') ) return;
-    this.controls.position.css('width', this._controllerProgressPercentage(this.video[0].currentTime, this.video[0].duration) + '%');
+    if ( this.isControllerVisible ) {
+      this.controls.position.css('width', this._controllerProgressPercentage(this.video[0].currentTime, this.video[0].duration) + '%');
+    }
   },
   _controllerProgressBufferStart: function() {
-    
+    // this._controllerProgressBufferInterval = setInterval(function(){
+    //       this._controllerProgressBufferUpdate();
+    //     }.context(this), 33);
   },
   _controllerProgressBufferStop: function() {
-    
+    clearInterval(this._controllerProgressBufferInterval);
   },
   _controllerProgressBufferUpdate: function() {
-    
+    if ( this.isControllerVisible ) {
+      this.controls.buffer.css('width', this._controllerProgressPercentage(this.video[0].buffered, this.video[0].duration) + '%');
+    }
+  },
+  _controllerForced: function(forced) {
+    if ( forced ) {
+      this.controls.prev.hide();
+      this.controls.next.hide();
+    } else {
+      this.controls.prev.show();
+      this.controls.next.show();
+    }
+  },
+  
+  // Video Listeners.
+  onVideoPlay: function(e) {
+    this.controls.play.text('Pause');
+  },
+  onVideoPause: function(e) {
+    this.controls.play.text('Play');
+    this._controllerProgressPositionStop();
+    //this._controllerProgressBufferStop();
+  },
+  onVideoPlaying: function(e) {
+    this._controllerForced(this.playlist[this.current].forced);
+    this._controllerProgressPositionStart();
+    //this._controllerProgressBufferStart();
+  },
+  onVideoLoad: function(e) {
+    this.debug(e);
+  },
+  onVideoLoadedData: function(e) {
+    this.debug(e);
   },
   
   // Controller Listeners.
@@ -133,9 +175,11 @@ $.ui.video.html5.controller = {
     this.next();
   },
   onControllerProgressStart: function(e) {
+    this._playerTextSelectionBlock();
     
   },
   onControllerProgressStop: function(e) {
+    this._playerTextSelectionUnblock();
     
   },
   onControllerProgressUpdate: function(e) {
@@ -173,5 +217,13 @@ $.ui.video.html5.controller = {
     
   }
 };
+
+Function.prototype.context = function(obj) {
+  var method = this
+  temp = function() {
+    return method.apply(obj, arguments)
+  }
+  return temp
+}
 
 })(jQuery);
