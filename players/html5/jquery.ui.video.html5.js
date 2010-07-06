@@ -240,7 +240,6 @@ $.ui.video.html5 = {
     return ( navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i) );
   }
 
-
 };
 
 Function.prototype.context = function(obj) {
