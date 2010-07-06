@@ -1,0 +1,130 @@
+.ui-video {
+  position: relative;
+}
+
+.ui-video-container {
+  position: absolute;
+  font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+  background-color: #fff;
+  overflow: hidden;
+  z-index: 1000;
+  
+  /* Shadows */
+  -webkit-box-shadow: 0 0 20px #000;
+  -moz-box-shadow: 0 0 20px #000;
+}
+
+.ui-video-container video {
+  background: #fff;
+}
+
+.ui-video-container.ui-video-fullscreen {
+  position: fixed;
+  background: #000;
+  z-index: 1001;
+}
+
+.ui-video-container.ui-video-fullscreen video {
+  background: #000;
+}
+
+.ui-video-poster,
+.ui-video-loader,
+.ui-video-error {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-position: center center;
+  text-align: center;
+}
+
+.ui-video-loader {
+  background-image: url(loader-white.gif);
+}
+
+.ui-video-error span {
+  display: block;
+  background-image: url(error.png);
+  background-repeat: no-repeat;
+  background-position: 50% 0;
+  padding: 230px 10em 0 10em;
+}
+
+/***** Controller *****/
+.ui-video-controller {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 300px;
+  margin: 20px 0;
+  padding: 0;
+  border: 1px solid #000;
+  background: -webkit-gradient(linear, left top, left bottom, from(#222), to(#111));
+  background: -moz-linear-gradient(top,  #222,  #111);
+  color: #fff;
+  font-size: 11px;
+  opacity: 0.9;
+  
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  
+  /* Shadows */
+  -webkit-box-shadow: 0 0 10px #000;
+  -moz-box-shadow: 0 0 10px #000;
+}
+
+.ui-video-controller li {
+  display: block;
+}
+
+/***** Buttons *****/
+.ui-video-control-button {
+  float: left;
+  height: 25px;
+  margin: 5px 0 5px 5px;
+  cursor: pointer;
+}
+
+/***** Progress Bar *****/
+.ui-video-control-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 288px;
+}
+
+.ui-video-control-progress ul {
+  position: relative;
+  width: 288px;
+  height: 5px;
+  margin: 5px;
+  padding: 0;
+  border: 1px solid #000;
+  background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#222));
+  background: -moz-linear-gradient(top,  #000,  #222);
+  
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+}
+
+.ui-video-control-progress ul li {
+  position: absolute;
+  top: 0;
+  left: 0;
+  float: none;
+  clear: both;
+  width: 0;
+  height: 5px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#808080));
+  background: -moz-linear-gradient(top,  #fff,  #808080);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+}
+
+.ui-video-control-progress .ui-video-control-buffer {
+  background: -webkit-gradient(linear, left top, left bottom, from(#333), to(#555));
+  background: -moz-linear-gradient(top,  #333,  #555);
+}
