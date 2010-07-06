@@ -45,8 +45,10 @@ $.ui.video.html5.controller = {
     this.video[0].addEventListener('play', this.onVideoPlay.context(this), false);
     this.video[0].addEventListener('playing', this.onVideoPlaying.context(this), false);
     this.video[0].addEventListener('pause', this.onVideoPause.context(this), false);
+    this.video[0].addEventListener('progress', this.onVideoProgress.context(this), false);
     this.video[0].addEventListener('loadstart', this.onVideoLoad.context(this), false);
     this.video[0].addEventListener('loadeddata', this.onVideoLoadedData.context(this), false);
+    this.video[0].addEventListener('ended', this.onVideoEnd.context(this), false);
     
     // Control events.
     this.video.bind('click', this.onControllerPlay.context(this));
@@ -118,16 +120,16 @@ $.ui.video.html5.controller = {
     }
   },
   _controllerProgressBufferStart: function() {
-    // this._controllerProgressBufferInterval = setInterval(function(){
-    //       this._controllerProgressBufferUpdate();
-    //     }.context(this), 33);
+    this._controllerProgressBufferInterval = setInterval(function(){
+      this._controllerProgressBufferUpdate();
+    }.context(this), 33);
   },
   _controllerProgressBufferStop: function() {
     clearInterval(this._controllerProgressBufferInterval);
   },
   _controllerProgressBufferUpdate: function() {
     if ( this.isControllerVisible ) {
-      this.controls.buffer.css('width', this._controllerProgressPercentage(this.video[0].buffered, this.video[0].duration) + '%');
+      this.controls.buffer.css('width', this._controllerProgressPercentage(this.video[0].buffered.end(0), this.video[0].duration) + '%');
     }
   },
   _controllerForced: function(forced) {
@@ -159,6 +161,12 @@ $.ui.video.html5.controller = {
   },
   onVideoLoadedData: function(e) {
     this.debug(e);
+  },
+  onVideoEnd: function(e) {
+    this._controllerProgressBufferStop();
+  },
+  onVideoProgress: function(e) {
+    this.controls.buffer.css('width', this._controllerProgressPercentage(this.video[0].buffered.end(0), this.video[0].duration) + '%');
   },
   
   // Controller Listeners.
