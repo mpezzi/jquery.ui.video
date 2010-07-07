@@ -42,12 +42,12 @@
 }
 
 .ui-video-loader {
-  background-image: url(loader-white.gif);
+  background-image: url(../images/loader-white.gif);
 }
 
 .ui-video-error span {
   display: block;
-  background-image: url(error.png);
+  background-image: url(../images/error.png);
   background-repeat: no-repeat;
   background-position: 50% 0;
   padding: 230px 10em 0 10em;
