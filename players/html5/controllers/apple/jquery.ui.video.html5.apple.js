@@ -47,6 +47,7 @@
       this.media.addEventListener('loadstart', this.onControllerMediaLoadStart.context(this), false);
       this.media.addEventListener('loadeddata', this.onControllerMediaLoadedData.context(this), false);
       this.media.addEventListener('ended', this.onControllerMediaEnded.context(this), false);
+      this.media.addEventListener('error', this.onControllerMediaError.context(this), false);
       
       // Register Controller event listeners.
       this.video.bind('click', this.onControllerPlay.context(this));
@@ -155,6 +156,9 @@
     onControllerMediaEnded: function(e) {
       this.debug('[event onControllerMediaEnded]');
       this._controllerProgressPositionTrackStop();
+    },
+    onControllerMediaError: function(e) {
+      this._controllerForced(false);
     },
     
     // Controller events.
