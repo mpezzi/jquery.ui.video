@@ -164,8 +164,8 @@
     _playerPosition: function() {
       this.debug('[_playerPosition]');
     },
-    _playerPosterCreate: function() {
-      
+    _playerSetVolume: function(l) {
+      this.media.volume = localStorage['volume'] = 1;
     },
     _playerFile: function(src) {
       return src.replace('.' + this._playerFileExtension(src), '.' + this.codec);
