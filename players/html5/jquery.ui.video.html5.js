@@ -15,6 +15,15 @@
     codecs: { mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', ogg: 'video/ogg; codecs="theora, vorbis"', webm: 'video/webm; codecs="vp8, vorbis"' },
     controller: 'apple',
     isFullscreen: false,
+    messages: {
+      error: [
+        'An unknown error occurred.',
+        'You aborted the video playback.',
+        'A network error caused the video download to fail part-way.',
+        'The video playback was aborted due to a corruption problem <br />or because the video used features your browser did not support.',
+        'The video could not be loaded, either because the server or <br />network failed or because the format is not supported.'
+      ]
+    },
     
     // Initialize player.
     _init: function() {
@@ -168,7 +177,10 @@
       //this.debug('[event onPlayerVolumeChange]');
     },
     onPlayerError: function(e) {
-      //this.debug('[event onPlayerError]');
+      this.debug('[event onPlayerError]');
+      this._playerPosterHide();
+      this._playerLoaderHide();
+      this._playerErrorShow(this.media.error);
     },
     onPlayerResize: function(e) {
       
