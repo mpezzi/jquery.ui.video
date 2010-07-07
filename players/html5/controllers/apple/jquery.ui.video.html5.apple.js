@@ -21,8 +21,8 @@
       // Create control elements.
       this.control = {
         play:       $('<li class="ui-video-control-button ui-video-control-play">Play</li>').attr('title', 'Play').appendTo(this.controls),
-        next:       $('<li class="ui-video-control-button ui-video-control-next">Next</li>').attr('title', 'Next').appendTo(this.controls),
         prev:       $('<li class="ui-video-control-button ui-video-control-prev">Prev</li>').attr('title', 'Prev').appendTo(this.controls),
+        next:       $('<li class="ui-video-control-button ui-video-control-next">Next</li>').attr('title', 'Next').appendTo(this.controls),
         progress:   $('<li class="ui-video-control-progress"><ul></ul></li>').appendTo(this.controls),
         position:   $('<li class="ui-video-control-bar ui-video-control-position"></li>'),
         buffer:     $('<li class="ui-video-control-bar ui-video-control-buffer"></li>'),
