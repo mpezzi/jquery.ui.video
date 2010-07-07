@@ -60,6 +60,9 @@
     fullscreen: function(visible) {
       
     },
+    poster: function(visible) {
+      visible ? this._playerPosterShow() : this._playerPosterHide();
+    },
     
     // Private methods.
     _playerCreate: function() {
@@ -115,6 +118,46 @@
           type = this.codecs[this._playerFileExtension(src)];
 
       $('<source>').attr({ src: src, type: type }).appendTo(this.video);
+    },
+    _playerPosterCreate: function() {
+      var poster = $('img.poster', this.element).attr('src');
+      
+      if ( this.support.iOS() ) {
+        this.video.attr('poster', poster);
+      } else {
+        this.poster.css({ backgroundImage: 'url('+ poster +')', backgroundRepeat: 'no-repeat' });
+        this.poster.show();
+      }
+    },
+    _playerPosterShow: function() {
+      if ( !this.support.iOS() ) {
+        this.poster.filter(':hidden').show();
+        this._playerErrorHide();
+        this._playerLoaderHide();
+      }
+    },
+    _playerPosterHide: function() {
+      if ( !this.support.iOS() ) {
+        this.poster.filter(':visible').fadeOut();
+      }
+    },
+    _playerLoaderShow: function() {
+      if ( !this.support.iOS() ) {
+        this.loader.filter(':hidden').fadeIn();
+        this._playerErrorHide();
+        this._playerPosterHide();
+      };
+    },
+    _playerLoaderHide: function() {
+      if ( !this.support.iOS() ) {
+        this.loader.filter(':visible').fadeOut();
+      }
+    },
+    _playerErrorShow: function(e) {
+      this.error.filter(':hidden').fadeIn().find('span').html(this.messages.error[e.code] || messages[0]);
+    },
+    _playerErrorHide: function() {
+      this.error.filter(':visible').fadeOut();
     },
     _playerPosition: function() {
       this.debug('[_playerPosition]');
