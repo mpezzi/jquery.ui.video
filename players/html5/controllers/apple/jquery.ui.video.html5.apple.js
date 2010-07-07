@@ -95,13 +95,32 @@
     _controllerPosition: function() {
       this.controls.css('left', ( this.video.width() / 2 ) - ( this.controls.width() / 2) + 'px');
     },
+    _controllerProgressPercentage: function(x, y) {
+      var percent = ( x / y ) * 100;
+      return ( percent <= 100 && percent >= 0 ) ? percent : 0;
+    },
+    _controllerProgressPositionTrackStart: function() {
+      this._controllerProgressPositionTrackInterval = setInterval(function(){
+        this._controllerProgressPositionTrackUpdate();
+      }.context(this), 33);
+    },
+    _controllerProgressPositionTrackStop: function() {
+      clearInterval(this._controllerProgressPositionTrackInterval);
+    },
+    _controllerProgressPositionTrackUpdate: function() {
+      if ( this.isControllerVisible ) {
+        this.control.position.css('width', this._controllerProgressPercentage(this.media.currentTime, this.media.duration) + '%');
+      }
+    },
     _controllerForced: function(forced) {
       if ( forced ) {
         this.control.prev.hide();
         this.control.next.hide();
+        this.media.seekable = false;
       } else {
         this.control.prev.show();
         this.control.next.show();
+        this.media.seekable = true;
       }
     },
     
@@ -113,6 +132,7 @@
     onControllerMediaPlaying: function(e) {
       this.debug('[event onControllerMediaPlaying]');
       this._controllerForced(this.playlist[this.current].forced);
+      this._controllerProgressPositionTrackStart();
     },
     onControllerMediaPause: function(e) {
       this.debug('[event onControllerMediaPause]');
@@ -120,15 +140,21 @@
     },
     onControllerMediaProgress: function(e) {
       this.debug('[event onControllerMediaProgress]');
+      
+      var loaded = e.loaded || this.media.buffered.end(0),
+          total = e.total || this.media.duration;
+      
+      this.control.buffer.css('width', Math.round(this._controllerProgressPercentage(loaded, total)) + "%");
     },
     onControllerMediaLoadStart: function(e) {
-      this.debug('[event onControllerMediaLoadStart]');
+      //this.debug('[event onControllerMediaLoadStart]');
     },
     onControllerMediaLoadedData: function(e) {
       this.debug('[event onControllerMediaLoadedData]');
     },
     onControllerMediaEnded: function(e) {
       this.debug('[event onControllerMediaEnded]');
+      this._controllerProgressPositionTrackStop();
     },
     
     // Controller events.
