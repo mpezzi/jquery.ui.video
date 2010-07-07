@@ -146,10 +146,10 @@
     },
     onControllerShow: function(e) {
       this._controllerShow();
-      this._controllerHide(true);
+      //this._controllerHide(true);
     },
     onControllerHide: function(e) {
-      this._controllerHide(true);
+      //this._controllerHide(true);
     },
     onControllerOver: function(e) {
       this.isControllerActive = true;
@@ -158,7 +158,7 @@
       this.isControllerActive = false;
     },
     onControllerFullscreen: function(e) {
-      this.debug('[event onControllerFullscreen]');
+      //this.debug('[event onControllerFullscreen]');
     },
     onControllerKeyPress: function(e) {
       
