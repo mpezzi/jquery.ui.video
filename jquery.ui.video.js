@@ -93,15 +93,9 @@
     },
     
     support: {
-      iOS: function() {
-        return ( navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i) );
-      },
-      html5: function() { 
-        return !!document.createElement('video').canPlayType;
-      },
-      flash: function() { 
-        return false;
-      }
+      iOS: function() { return ( navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i) ); },
+      html5: function() { return !!document.createElement('video').canPlayType; },
+      flash: function() { return false; }
     },
     
     // Debug messages.
