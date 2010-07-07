@@ -120,6 +120,13 @@
       var parts = src.split('?')[0].split('.');
       return parts[parts.length - 1];
     },
+    _playerTextSelectionBlock: function() {
+      document.body.focus();
+      document.onselectstart = function() { return false; };
+    },
+    _playerTextSelectionUnblock: function() {
+      document.onselectstart = function() { return true; };
+    },
     
     // HTMLMediaElement events.
     onPlayerPlay: function(e) {
