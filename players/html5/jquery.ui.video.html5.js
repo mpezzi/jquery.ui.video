@@ -39,9 +39,11 @@
     // Public methods.
     load: function(i) {
       if ( i !== undefined && this.current !== i && this.playlist[i] !== undefined ) {
+        this._playerLoaderShow();
         this.media.src = this._playerFile(this.playlist[i].url);
         this.media.load();
         this.current = i;
+        this.forced = this.playlist[i].forced;
       }
     },
     play: function(i) {
@@ -185,7 +187,10 @@
       //this.debug('[event onPlayerPlay]');
     },
     onPlayerPlaying: function(e) {
-      //this.debug('[event onPlayerPlaying]');
+      this.debug('[event onPlayerPlaying]');
+      this._playerPosterHide();
+      this._playerLoaderHide();
+      this._playerErrorHide();
     },
     onPlayerPause: function(e) {
       //this.debug('[event onPlayerPause]');
@@ -199,16 +204,19 @@
     },
     onPlayerFinished: function(e) {
       this.debug('[event onPlayerFinished]');
+      this._playerPosterShow();
       this.load(0);
     },
     onPlayerProgress: function(e) {
       //this.debug('[event onPlayerProgress]');
     },
     onPlayerWaiting: function(e) {
-      //this.debug('[event onPlayerWaiting]');
+      this.debug('[event onPlayerWaiting]');
+      this._playerLoaderShow();
     },
     onPlayerStalled: function(e) {
-      //this.debug('[event onPlayerStalled]');
+      this.debug('[event onPlayerStalled]');
+      this._playerLoaderShow();
     },
     onPlayerLoadStart: function(e) {
       //this.debug('[event onPlayerLoadStart]');
