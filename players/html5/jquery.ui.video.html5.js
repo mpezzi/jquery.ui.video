@@ -86,7 +86,6 @@
       this.media.addEventListener('pause', this.onPlayerPause.context(this), false);
       this.media.addEventListener('seeking', this.onPlayerSeeking.context(this), false);
       this.media.addEventListener('ended', this.onPlayerEnded.context(this), false);
-      this.media.addEventListener('progress', this.onPlayerProgress.context(this), false);
       this.media.addEventListener('waiting', this.onPlayerWaiting.context(this), false);
       this.media.addEventListener('stalled', this.onPlayerStalled.context(this), false);
       this.media.addEventListener('loadstart', this.onPlayerLoadStart.context(this), false);
@@ -124,40 +123,45 @@
     
     // HTMLMediaElement events.
     onPlayerPlay: function(e) {
-      this.debug('[event: onPlayerPlay]');
+      //this.debug('[event onPlayerPlay]');
     },
     onPlayerPlaying: function(e) {
-      this.debug('[event: onPlayerPlaying]');
+      //this.debug('[event onPlayerPlaying]');
     },
     onPlayerPause: function(e) {
-      this.debug('[event: onPlayerPause]');
+      //this.debug('[event onPlayerPause]');
     },
     onPlayerSeeking: function(e) {
-      this.debug('[event: onPlayerSeeking]');
+      //this.debug('[event onPlayerSeeking]');
     },
     onPlayerEnded: function(e) {
       this.debug('[event: onPlayerEnded]');
+      this.playlist[this.current + 1] !== undefined ? this.next() : this.onPlayerFinished(e);
+    },
+    onPlayerFinished: function(e) {
+      this.debug('[event onPlayerFinished]');
+      this.load(0);
     },
     onPlayerProgress: function(e) {
-      this.debug('[event: onPlayerProgress]');
+      //this.debug('[event onPlayerProgress]');
     },
     onPlayerWaiting: function(e) {
-      this.debug('[event: onPlayerWaiting]');
+      //this.debug('[event onPlayerWaiting]');
     },
     onPlayerStalled: function(e) {
-      this.debug('[event: onPlayerStalled]');
+      //this.debug('[event onPlayerStalled]');
     },
     onPlayerLoadStart: function(e) {
-      this.debug('[event: onPlayerLoadStart]');
+      //this.debug('[event onPlayerLoadStart]');
     },
     onPlayerLoadedData: function(e) {
-      this.debug('[event: onPlayerLoadedData]');
+      //this.debug('[event onPlayerLoadedData]');
     },
     onPlayerVolumeChange: function(e) {
-      this.debug('[event: onPlayerVolumeChange]');
+      //this.debug('[event onPlayerVolumeChange]');
     },
     onPlayerError: function(e) {
-      this.debug('[event: onPlayerError]');
+      //this.debug('[event onPlayerError]');
     },
     onPlayerResize: function(e) {
       
