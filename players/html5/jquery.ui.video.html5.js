@@ -164,6 +164,23 @@
     _playerPosition: function() {
       this.debug('[_playerPosition]');
     },
+    _playerFullscreen: function(fullscreen) {
+      var self = this, elements = [ this.container, this.video, this.loader, this.error, this.poster ];
+      
+      if ( fullscreen ) {
+        this.container.css({ position: 'fixed', top: 0, left: 0 }).addClass('ui-video-fullscreen');
+        $.each(elements, function(){
+          $(this).css({ width: $(window).width(), height: $(window).height() });
+        });
+        this.isFullscreen = true;
+      } else {
+        this.container.css('position', 'relative').removeClass('ui-video-fullscreen');
+        $.each(elements, function(){
+          $(this).css({ width: self.options.width, height: self.options.height });
+        });
+        this.isFullscreen = false;
+      }
+    },
     _playerSetVolume: function(l) {
       this.media.volume = localStorage['volume'] = 1;
     },
@@ -242,7 +259,11 @@
       this._playerErrorShow(this.media.error);
     },
     onPlayerResize: function(e) {
-      
+      if ( this.isFullscreen ) {
+        $.each([ this.container, this.video, this.loader, this.error, this.poster ], function(){
+          $(this).css({ width: $(window).width(), height: $(window).height() });
+        });
+      }
     }
   };
   

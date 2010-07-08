@@ -66,6 +66,9 @@
       // Register Keyboard event listeners.
       $(document).bind('keyup', this.onControllerKeyPress.context(this));
       
+      // Register Window event listeners.
+      $(window).resize(this.onControllerPlayerResize.context(this));
+      
       // Show playlist buttons for multiple videos.
       if ( this.playlist.length > 1 ) {
         this.control.prev.show();
@@ -188,10 +191,15 @@
       this.isControllerActive = false;
     },
     onControllerFullscreen: function(e) {
-      //this.debug('[event onControllerFullscreen]');
+      this.debug('[event onControllerFullscreen]');
+      this._playerFullscreen(!this.isFullscreen);
+      this._controllerPosition();
     },
     onControllerKeyPress: function(e) {
       
+    },
+    onControllerPlayerResize: function(e) {
+      this._controllerPosition();
     }
     
   };
