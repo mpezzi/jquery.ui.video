@@ -23,12 +23,17 @@
       preload: false,
       autoplay: false,
       controls: false,
-      player: null,
+      player: false,
       players: { html5: 'html5', flash: 'flowplayer' },
       classes: {
         item: 'item',
         forced: 'item-forced'
       }
+    },
+    
+    // Public functions.
+    player: function() {
+      return this.options.player;
     },
     
     // Create Player instance.
@@ -56,7 +61,15 @@
       this.element.video = $.extend(this, {
         container: uiVideoContainer,
         current: 0
-      }, this.support.html5() ? $.ui.video[o.players.html5] : $.ui.video[o.players.flash], this._createPlaylist());
+      }, this._createPlayer(), this._createPlaylist());
+      
+      return this;
+    },
+    
+    _createPlayer: function() {
+      this.debug('[_createPlayer]');
+      this.options.player = this.options.player || ( this.support.html5() ? this.options.players.html5 : this.options.players.flash );
+      return $.ui.video[this.options.player];
     },
     
     // Create Playlist.
