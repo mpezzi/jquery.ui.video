@@ -184,7 +184,8 @@
     
     // HTMLMediaElement events.
     onPlayerPlay: function(e) {
-      //this.debug('[event onPlayerPlay]');
+      this.debug('[event onPlayerPlay]');
+      this.element.trigger('play', this.playlist[this.current]);
     },
     onPlayerPlaying: function(e) {
       this.debug('[event onPlayerPlaying]');
@@ -194,16 +195,20 @@
     },
     onPlayerPause: function(e) {
       //this.debug('[event onPlayerPause]');
+      this.element.trigger('pause', this.playlist[this.current]);
     },
     onPlayerSeeking: function(e) {
       //this.debug('[event onPlayerSeeking]');
     },
     onPlayerEnded: function(e) {
       this.debug('[event: onPlayerEnded]');
+      this.element.trigger('ended', this.playlist[this.current]);
       this.playlist[this.current + 1] !== undefined ? this.next() : this.onPlayerFinished(e);
+      
     },
     onPlayerFinished: function(e) {
       this.debug('[event onPlayerFinished]');
+      this.element.trigger('finished');
       this._playerPosterShow();
       this.load(0);
     },
@@ -212,10 +217,12 @@
     },
     onPlayerWaiting: function(e) {
       this.debug('[event onPlayerWaiting]');
+      this.element.trigger('waiting', this.playlist[this.current]);
       this._playerLoaderShow();
     },
     onPlayerStalled: function(e) {
       this.debug('[event onPlayerStalled]');
+      this.element.trigger('stalled', this.playlist[this.current]);
       this._playerLoaderShow();
     },
     onPlayerLoadStart: function(e) {
@@ -229,6 +236,7 @@
     },
     onPlayerError: function(e) {
       this.debug('[event onPlayerError]');
+      this.element.trigger('error', this.playlist[this.current]);
       this._playerPosterHide();
       this._playerLoaderHide();
       this._playerErrorShow(this.media.error);
