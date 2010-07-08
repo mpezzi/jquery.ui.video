@@ -40,6 +40,11 @@
 
 <div id="page">
   
+  <ul>
+    <li><a href="?p=html5">HTML5 Version</a></li>
+    <li><a href="?p=flowplayer">Flowplayer Version</a></li>
+  </ul>
+  
   <div id="debug">
     Debugger
   </div>
