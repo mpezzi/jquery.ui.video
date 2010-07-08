@@ -10,8 +10,8 @@
   z-index: 1000;
   
   /* Shadows */
-  -webkit-box-shadow: 0 0 20px #000;
-  -moz-box-shadow: 0 0 20px #000;
+  /*  -webkit-box-shadow: 0 0 20px #000;*/
+  /*  -moz-box-shadow: 0 0 20px #000;*/
 }
 
 .ui-video-container video {
