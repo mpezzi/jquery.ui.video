@@ -17,10 +17,20 @@
   <script type="text/javascript" src="../players/html5/jquery.ui.video.html5.js"></script>
   <script type="text/javascript" src="../players/html5/controllers/apple/jquery.ui.video.html5.apple.js"></script>
   <script type="text/javascript" src="../players/flowplayer/jquery.ui.video.flowplayer.js"></script>
+  <script type="text/javascript" src="../players/flowplayer/js/flowplayer-3.2.2.min.js"></script>
   
   <script type="text/javascript">
     $(document).ready(function(){
-      $('.ui-video').video();
+      //var video = $('.ui-video').video();
+      var v = $('.ui-video');
+      
+      v.video({ player: '<?php print $_GET["p"]; ?>' }).bind('play', function(e, item){
+        $('#debug').html(item.url);
+      });
+      
+      $('#controls a').click(function(){
+        v.video( $(this).attr('id') );
+      });
     });
   </script>
   
@@ -29,6 +39,17 @@
 <body>
 
 <div id="page">
+  
+  <div id="debug">
+    Debugger
+  </div>
+  
+  <p id="controls">
+    <a id="play">Play</a><br />
+    <a id="pause">Pause</a><br />
+    <a id="prev">Prev</a><br />
+    <a id="next">Next</a>
+  </p>
   
   <h1>jQuery UI Video Plugin</h1>
   
