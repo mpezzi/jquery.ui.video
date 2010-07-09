@@ -36,19 +36,19 @@
     },
     
     play: function() {
-      $f().play();
+      $f(this.flowplayer[0]).play();
     },
     pause: function() {
-      $f().pause();
+      $f(this.flowplayer[0]).pause();
     },
     stop: function() {
-      $f().stop();
+      $f(this.flowplayer[0]).stop();
     },
     prev: function() {
-      $f().play($f().getClip().index - 1);
+      $f(this.flowplayer[0]).play( $f(this.flowplayer[0]).getClip().index - 1 );
     },
     next: function() {
-      $f().play($f().getClip().index + 1);
+      $f(this.flowplayer[0]).play( $f(this.flowplayer[0]).getClip().index + 1 );
     },
     
     _createPlayer: function() {
