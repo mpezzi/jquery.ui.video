@@ -50,7 +50,7 @@
       this.media.addEventListener('error', this.onControllerMediaError.context(this), false);
       
       // Register Controller event listeners.
-      this.video.bind('click', this.onControllerPlay.context(this));
+      this.video.bind('mouseup', this.onControllerPlay.context(this));
       this.poster.bind('click', this.onControllerPlay.context(this));
       this.container.bind('mousemove', this.onControllerShow.context(this));
       this.container.bind('mouseleave', this.onControllerHide.context(this));
