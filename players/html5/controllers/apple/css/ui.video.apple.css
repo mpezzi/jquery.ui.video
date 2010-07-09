@@ -41,6 +41,18 @@
   text-align: center;
 }
 
+.ui-video-msg {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px 10px;
+  background-color: #000;
+  color: #fff;
+  font-size: 11px;
+  opacity: 0.75;
+}
+
 .ui-video-loader {
   background-image: url(../images/loader.gif);
 }
