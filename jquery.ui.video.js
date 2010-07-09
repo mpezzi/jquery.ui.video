@@ -80,7 +80,11 @@
       
       // Load a single video.
       if ( self.element.context.tagName == 'A' ) {
-        playlist[0] = { url: self.element.attr('href'), forced: $(this).hasClass(o.classes.forced) };
+        playlist[0] = { 
+          url: self.element.attr('href'),
+          linkUrl: $(this).attr('rel'),
+          forced: $(this).hasClass(o.classes.forced)
+        };
       }
       
       // Load multiple videos.
@@ -88,6 +92,8 @@
         $('.' + o.classes.item, self.element).each(function(i){
           playlist[i] = {
             url: $(this).attr('href'),
+            linkUrl: $(this).attr('rel').split('|')[0],
+            linkMsg: $(this).attr('rel').split('|')[1],
             forced: $(this).hasClass(o.classes.forced)
           };
         });

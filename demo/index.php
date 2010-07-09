@@ -61,7 +61,7 @@
   <p>This is a demonstration of the jQuery UI Video Plugin</p>
   
   <ol class="ui-video ui-video-autolay">
-    <li><a href="http://vhs.houseandhome.com/hhtv/advertisements/click_lighting/click15.mp4" class="item item-forced">Click Lighting</a></li>
+    <li><a rel="http://www.clicklightingandhome.com/Default.aspx|Find out more information about Click Lighting" href="http://vhs.houseandhome.com/hhtv/advertisements/click_lighting/click15.mp4" class="item item-forced">Click Lighting</a></li>
     <li><a href="http://vhs.houseandhome.com/hhtv/s01/opening2.mp4" class="item">Opening</a></li>
     <li><a href="http://vhs.houseandhome.com/hhtv/s01/e29/cameron_bedroom.mp4" class="item">Cameron<img class="poster" src="http://www.houseandhome.com/tv/sites/default/files/segments/cameron-bedroom.jpg" /></a></li>
     <li><a href="http://video-js.zencoder.com/oceans-clip.mp4" class="item">Oceans</a></li>

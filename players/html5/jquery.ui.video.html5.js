@@ -22,7 +22,8 @@
         'A network error caused the video download to fail part-way.',
         'The video playback was aborted due to a corruption problem <br />or because the video used features your browser did not support.',
         'The video could not be loaded, either because the server or <br />network failed or because the format is not supported.'
-      ]
+      ],
+      linkUrl: 'Click video for more information'
     },
     
     // Initialize player.
@@ -38,12 +39,13 @@
     
     // Public methods.
     load: function(i) {
-      if ( i !== undefined && this.current !== i && this.playlist[i] !== undefined ) {
-        this._playerLoaderShow();
+      if ( this.playlist[i] !== undefined ) {
+        this.debug('[loading ' + this._playerFile(this.playlist[i].url) +']');
+        
+        //this._playerLoaderShow();
         this.media.src = this._playerFile(this.playlist[i].url);
         this.media.load();
         this.current = i;
-        this.forced = this.playlist[i].forced;
       }
     },
     play: function(i) {
@@ -78,6 +80,7 @@
       this.poster = $('<div class="ui-video-poster"></div>').css(css).appendTo(this.container);
       this.loader = $('<div class="ui-video-loader"></div>').css(css).appendTo(this.container);
       this.error = $('<div class="ui-video-error"><span></span></div>').css(css).appendTo(this.container);
+      this.msg = $('<div class="ui-video-msg"></div>').appendTo(this.container);
       
       this.media = this.video[0];
       
@@ -115,11 +118,17 @@
         if ( this.media.canPlayType(this.codecs[c]) && this.codec == null ) this.codec = c;
       }
       
-      // Create source element and use appropriate codec.
-      var src = this._playerFile(this.playlist[0].url),
-          type = this.codecs[this._playerFileExtension(src)];
+      if ( this.support.iOS() ) {
+        // Create source element and use appropriate codec.
+        var src = this._playerFile(this.playlist[0].url),
+            type = this.codecs[this._playerFileExtension(src)];
 
-      $('<source>').attr({ src: src, type: type }).appendTo(this.video);
+        $('<source>').attr({ src: src, type: type }).appendTo(this.video);
+        
+        this.video.attr('controls', 'controls');
+      } else {
+        this.load(0);
+      }
     },
     _playerPosterCreate: function() {
       var poster = $('img.poster', this.element).attr('src');
@@ -161,6 +170,12 @@
     _playerErrorHide: function() {
       this.error.filter(':visible').fadeOut();
     },
+    _playerMsgShow: function(msg) {
+      this.msg.html(msg).filter(':hidden').fadeIn();
+    },
+    _playerMsgHide: function() {
+      this.msg.filter(':visible').fadeOut();
+    },
     _playerPosition: function() {
       this.debug('[_playerPosition]');
     },
@@ -179,6 +194,13 @@
           $(this).css({ width: self.options.width, height: self.options.height });
         });
         this.isFullscreen = false;
+      }
+    },
+    _playerLink: function(link) {
+      if ( link ) {
+        this.video.bind('click', function(){ window.location = link; });
+      } else {
+        this.video.unbind('click');
       }
     },
     _playerSetVolume: function(l) {
@@ -203,12 +225,15 @@
     onPlayerPlay: function(e) {
       this.debug('[event onPlayerPlay]');
       this.element.trigger('play', this.playlist[this.current]);
+      this.playlist[this.current].linkUrl ? this._playerMsgShow(this.playlist[this.current].linkMsg) : this._playerMsgHide();
     },
     onPlayerPlaying: function(e) {
       this.debug('[event onPlayerPlaying]');
       this._playerPosterHide();
       this._playerLoaderHide();
       this._playerErrorHide();
+      
+      this._playerLink(this.playlist[this.current].linkUrl);
     },
     onPlayerPause: function(e) {
       //this.debug('[event onPlayerPause]');
