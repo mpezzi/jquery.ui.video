@@ -2,6 +2,10 @@
   position: relative;
 }
 
+ol.ui-video li {
+  display: none;
+}
+
 .ui-video-container {
   position: absolute;
   font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
