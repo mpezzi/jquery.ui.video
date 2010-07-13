@@ -93,6 +93,10 @@
       // Initialize player.
       this._playerPosterCreate();
       this._playerInit();
+      
+      // Autoplay.
+      if ( this.options.autoplay )
+        this.play();
     },
     _playerInit: function() {
       this.debug('[_playerInit]');
