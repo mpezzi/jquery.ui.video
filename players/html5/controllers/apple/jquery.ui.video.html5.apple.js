@@ -33,7 +33,7 @@
       };
       
       // Add progress bars to progress element.
-      $([this.control.buffer, this.control.position]).appendTo(this.control.progress.find('ul'));
+      $([this.control.buffer, this.control.position]).appendTo( this.control.progress.find('ul') );
       
       this._controllerInit();
     },
