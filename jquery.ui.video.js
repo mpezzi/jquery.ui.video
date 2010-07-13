@@ -125,6 +125,25 @@
     
   });
   
+  // Google DFP Plugin.
+  $.widget('ui.videodfp', {
+    add: function(pos, item) {
+      var li    = $('<li class="item-inserted-dfp"></li>'),
+          link  = $('<a class="item">')
+                    .addClass(item.forced ? 'item-forced' : null)
+                    .attr('href', item.url)
+                    .attr('rel', item.linkUrl ? ( item.trackingUrl + item.linkUrl ) : '')
+                    .text(item.title)
+                    .appendTo(li);
+      
+      if ( pos == 'end' ) {
+        this.element.append(li);
+      } else if ( pos > 0 && pos <= $('li:not(.item-inserted-dfp)', this.element).length ) {
+        $('li:not(.item-inserted-dfp)', this.element).filter(':eq('+ (pos - 1) +')').before(li);
+      }
+    }
+  });
+  
   Function.prototype.context = function(obj) {
     var method = this
     temp = function() {
