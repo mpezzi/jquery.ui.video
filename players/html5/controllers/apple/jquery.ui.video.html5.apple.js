@@ -22,8 +22,8 @@
       // Create control elements.
       this.control = {
         play:       $('<li class="ui-video-control-button ui-video-control-play">Play</li>').attr('title', 'Play').appendTo(this.controls),
-        prev:       $('<li class="ui-video-control-button ui-video-control-prev">Prev</li>').attr('title', 'Prev').appendTo(this.controls),
-        next:       $('<li class="ui-video-control-button ui-video-control-next">Next</li>').attr('title', 'Next').appendTo(this.controls),
+        prev:       $('<li class="ui-video-control-button ui-video-control-prev">Prev</li>').attr('title', 'Prev').hide().appendTo(this.controls),
+        next:       $('<li class="ui-video-control-button ui-video-control-next">Next</li>').attr('title', 'Next').hide().appendTo(this.controls),
         progress:   $('<li class="ui-video-control-progress"><ul></ul></li>').appendTo(this.controls),
         position:   $('<li class="ui-video-control-bar ui-video-control-position"></li>'),
         buffer:     $('<li class="ui-video-control-bar ui-video-control-buffer"></li>'),
@@ -68,12 +68,6 @@
       
       // Register Window event listeners.
       $(window).resize(this.onControllerPlayerResize.context(this));
-      
-      // Show playlist buttons for multiple videos.
-      if ( this.playlist.length > 1 ) {
-        this.control.prev.show();
-        this.control.next.show();
-      }
     },
     _controllerShow: function() {
       if ( this.controls.is(':visible') ) return;
