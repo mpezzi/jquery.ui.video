@@ -11,10 +11,10 @@
 (function($){
   
   $.ui.video.html5 = {
+    _isFullscreen: false,
     codec: null,
     codecs: { mp4: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', ogg: 'video/ogg; codecs="theora, vorbis"', webm: 'video/webm; codecs="vp8, vorbis"' },
     controller: 'apple',
-    isFullscreen: false,
     messages: {
       error: [
         'An unknown error occurred.',
@@ -187,13 +187,13 @@
         $.each(elements, function(){
           $(this).css({ width: $(window).width(), height: $(window).height() });
         });
-        this.isFullscreen = true;
+        this._isFullscreen = true;
       } else {
         this.container.css('position', 'relative').removeClass('ui-video-fullscreen');
         $.each(elements, function(){
           $(this).css({ width: self.options.width, height: self.options.height });
         });
-        this.isFullscreen = false;
+        this._isFullscreen = false;
       }
     },
     _playerLink: function(link) {
@@ -289,7 +289,7 @@
       this._playerErrorShow(this.media.error);
     },
     onPlayerResize: function(e) {
-      if ( this.isFullscreen ) {
+      if ( this._isFullscreen ) {
         $.each([ this.container, this.video, this.loader, this.error, this.poster ], function(){
           $(this).css({ width: $(window).width(), height: $(window).height() });
         });

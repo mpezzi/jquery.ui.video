@@ -236,7 +236,7 @@
     },
     onControllerFullscreen: function(e) {
       this.debug('[event onControllerFullscreen]');
-      this._playerFullscreen(!this.isFullscreen);
+      this._playerFullscreen(!this._isFullscreen);
       this._controllerPosition();
     },
     onControllerKeyPress: function(e) {
