@@ -11,6 +11,7 @@
 (function($){
   
   $.ui.video.html5.apple = {
+    videoWasPlaying: false,
     
     _controllerCreate: function() {
       this.debug('[_controllerCreate]');
@@ -59,8 +60,7 @@
       this.control.play.bind('mouseup', this.onControllerPlay.context(this));
       this.control.prev.bind('mouseup', this.onControllerPrev.context(this));
       this.control.next.bind('mouseup', this.onControllerNext.context(this));
-      // this.control.progress.bind('mousedown', this.onControllerProgressPositionStart.context(this));
-      // this.control.progress.bind('mouseup', this.controllerProgressPositionStop.context(this));
+      this.control.progress.bind('mousedown', this.onControllerProgressPositionDragStart.context(this));
       this.control.fullscreen.bind('mouseup', this.onControllerFullscreen.context(this));
       
       // Register Keyboard event listeners.
@@ -99,9 +99,21 @@
     _controllerPosition: function() {
       this.controls.css('left', ( this.video.width() / 2 ) - ( this.controls.width() / 2) + 'px');
     },
-    _controllerProgressPercentage: function(x, y) {
+    _controllerPercentage: function(x, y) {
       var percent = ( x / y ) * 100;
       return ( percent <= 100 && percent >= 0 ) ? percent : 0;
+    },
+    _controllerRelativePosition: function(x, element) {
+      return Math.max(0, Math.min(1, ( x - this._controllerFindX(element) ) / element.offsetWidth));
+    },
+    _controllerFindX: function(element) {
+      var x = element.offsetLeft;
+      
+      while ( element = element.offsetParent ) {
+        x += element.offsetLeft;
+      }
+      
+      return x;
     },
     _controllerProgressPositionTrackStart: function() {
       this._controllerProgressPositionTrackInterval = setInterval(function(){
@@ -113,7 +125,7 @@
     },
     _controllerProgressPositionTrackUpdate: function() {
       if ( this.isControllerVisible ) {
-        this.control.position.css('width', this._controllerProgressPercentage(this.media.currentTime, this.media.duration) + '%');
+        this.control.position.css('width', this._controllerPercentage(this.media.currentTime, this.media.duration) + '%');
       }
     },
     _controllerForced: function(forced) {
@@ -148,7 +160,7 @@
       var loaded = e.loaded || this.media.buffered.end(0),
           total = e.total || this.media.duration;
       
-      this.control.buffer.css('width', Math.round(this._controllerProgressPercentage(loaded, total)) + "%");
+      this.control.buffer.css('width', Math.round(this._controllerPercentage(loaded, total)) + "%");
     },
     onControllerMediaLoadStart: function(e) {
       //this.debug('[event onControllerMediaLoadStart]');
@@ -189,6 +201,38 @@
     },
     onControllerOut: function(e) {
       this.isControllerActive = false;
+    },
+    onControllerProgressPositionDragStart: function(e) {
+      var self = this;
+      
+      // Disable any text selection on document.
+      self._playerTextSelectionBlock();
+      
+      // Remember current video state.
+      if ( self.media.paused ) {
+        self.videoWasPlaying = false;
+      } else {
+        self.videoWasPlaying = true;
+        self.media.pause();
+      }
+      
+      $(document)
+        .bind('mousemove', self.onControllerProgressPositionDragUpdate.context(self))
+        .bind('mouseup', function() {
+          $(this).unbind('mousemove mouseup');
+          
+          // Enable any text selection on document.
+          self._playerTextSelectionUnblock();
+          
+          // Return video to previous play state.
+          if ( self.videoWasPlaying ) {
+            self.media.play();
+          }
+        });
+    },
+    onControllerProgressPositionDragUpdate: function(e) {
+      //this.debug(this._controllerRelativePosition(e.pageX, this.control.progress[0]) * this.media.duration);
+      this._playerSetPosition( this._controllerRelativePosition(e.pageX, this.control.progress[0]) * this.media.duration );
     },
     onControllerFullscreen: function(e) {
       this.debug('[event onControllerFullscreen]');

@@ -203,6 +203,11 @@
         this.video.unbind('click');
       }
     },
+    _playerSetPosition: function(time) {
+      if ( time > 0 && time <= this.media.duration ) {
+        this.media.currentTime = Math.round(time);
+      }
+    },
     _playerSetVolume: function(l) {
       this.media.volume = localStorage['volume'] = 1;
     },
