@@ -32,9 +32,10 @@
   </script>
   <script type='text/javascript'>GA_googleFetchAds();</script>
   <script type="text/javascript">GA_googleAddAttr('sponsor', 'hhtv');</script>
-  <script type='text/javascript'>//GA_googleFillSlot("HH_TV_Video_640x360");</script>
+  <script type='text/javascript'>GA_googleFillSlot("HH_TV_Video_640x360");</script>
   <script type="text/javascript">
     
+    /*
     $(document).ready(function(){
       if ( v != undefined ) {
         v.videodfp('add', 1, {
@@ -56,6 +57,7 @@
         });
       }
     });
+    */
     
   </script>
   <script type="text/javascript">
