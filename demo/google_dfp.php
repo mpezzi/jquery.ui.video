@@ -34,12 +34,13 @@
   <script type="text/javascript">GA_googleAddAttr('sponsor', 'hhtv');</script>
   <script type='text/javascript'>//GA_googleFillSlot("HH_TV_Video_640x360");</script>
   <script type="text/javascript">
+    
     $(document).ready(function(){
       if ( v != undefined ) {
         v.videodfp('add', 1, {
           title: 'Home Hardware Signature Series',
           url: 'http://vhs.houseandhome.com/hhtv/advertisements/homehardware/homehardware_ad1.mp4',
-          banner: 'http://www.houseandhome.com/en/test/images/test-bigbox-1-dark.jpg',
+          banner: 'http://www.houseandhome.com/test/images/test-bigbox-1-dark.jpg',
           linkUrl: 'http://www.homehardware.com|HHTV_Home Hardware_Signature',
           trackingUrl: '%%CLICK_URL_ESC%%',
           forced: true
@@ -48,19 +49,30 @@
         v.videodfp('add', 4, {
           title: 'HHTV_ClickLighting_welcomevideo',
           url: 'http://vhs.houseandhome.com/hhtv/advertisements/click_lighting/click15.mp4',
-          banner: 'http://www.houseandhome.com/en/test/images/test-bigbox-3-dark.jpg',
+          banner: 'http://www.houseandhome.com/test/images/test-bigbox-3-dark.jpg',
           linkUrl: 'http://clicklightingandhome.com/|HHTV_ClickLighting_welcomevideo',
           trackingUrl: '%%CLICK_URL_ESC%%',
           forced: true
         });
       }
     });
+    
   </script>
   <script type="text/javascript">
     $(document).ready(function(){
+      var debug = $('#debug');
       
       // Initialize player.
-      v.video({ player: '<?php print $_GET["p"]; ?>' }).bind('play', function(e, item){ $('#debug').html(item.url); });
+      v.video({ player: '<?php print $_GET["p"]; ?>' }).bind('play', function(e, item){
+        if ( item.banner ) {
+          var banner    = $('<a>').attr('href', item.trackingUrl + item.linkUrl),
+              bannerImg = $('<img>').attr({ src: item.banner, border: 0 }).appendTo(banner);
+          
+          debug.html(banner).fadeIn();
+        } else {
+          debug.fadeOut();
+        }
+      });
       
       // Link control elements.
       $('#controls a').click(function(){ v.video( $(this).attr('id') ); });
@@ -78,9 +90,7 @@
     <li><a href="?p=flowplayer">Flowplayer Version</a></li>
   </ul>
   
-  <div id="debug">
-    Debugger
-  </div>
+  
   
   <p id="controls">
     <a id="play">Play</a><br />
@@ -101,6 +111,8 @@
     <li><a href="http://vhs.houseandhome.com/hhtv/s01/e29/mcewan_food.mp4" class="item">McEwan</a></li>
     <li><a href="http://vhs.houseandhome.com/hhtv/s01/e29/e29_credits.mp4" class="item">Credits<img class="poster" src="http://www.houseandhome.com/tv/sites/default/files/segments/cameron-bedroom.jpg" /></a></li>
   </ol>
+  
+  <div id="debug"></div>
   
   <script type='text/javascript'>
     GA_googleFillSlot("HH_TV_Dynamic_Bigbox_300x250");
