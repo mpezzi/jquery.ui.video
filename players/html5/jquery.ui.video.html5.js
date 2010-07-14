@@ -62,7 +62,7 @@
       this.play(this.current + 1);
     },
     fullscreen: function(visible) {
-      
+      this._playerFullscreen(visible);
     },
     poster: function(visible) {
       visible ? this._playerPosterShow() : this._playerPosterHide();
