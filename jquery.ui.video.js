@@ -94,6 +94,7 @@
             url: $(this).attr('href'),
             linkUrl: $(this).attr('rel').split('|')[0],
             linkMsg: $(this).attr('rel').split('|')[1],
+            banner: $(this).find('img.banner').attr('src'),
             forced: $(this).hasClass(o.classes.forced)
           };
         });
@@ -129,12 +130,16 @@
   $.widget('ui.videodfp', {
     add: function(pos, item) {
       var li    = $('<li class="item-inserted-dfp"></li>'),
-          link  = $('<a class="item">')
+          link  = $('<a class="item"></a>')
                     .addClass(item.forced ? 'item-forced' : null)
                     .attr('href', item.url)
                     .attr('rel', item.linkUrl ? ( item.trackingUrl + item.linkUrl ) : '')
                     .text(item.title)
                     .appendTo(li);
+      
+      if ( item.banner ) {
+        $('<img class="banner" />').attr('src', item.banner).appendTo(link);
+      }
       
       if ( pos == 'end' ) {
         this.element.append(li);
