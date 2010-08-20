@@ -27,7 +27,7 @@
     },
     
     // Initialize player.
-    _init: function() {
+    _create: function() {
       this.debug('[_init]');
       
       // Hide original element.

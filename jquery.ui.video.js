@@ -16,7 +16,7 @@
   $.widget('ui.video', {
     
     // Default options.
-    options: {
+    defaults: {
       debug: true,
       width: 640,
       height: 360,
@@ -37,8 +37,10 @@
     },
     
     // Create Player instance.
-    _create: function() {
-      this.debug('[_create]');
+    _init: function() {
+      this.debug('[_init]');
+      
+      this.options = $.extend({}, this.defaults, this.options);
       
       var self = this, o = self.options,
           
@@ -62,6 +64,8 @@
         container: uiVideoContainer,
         current: 0
       }, this._createPlayer(), this._createPlaylist());
+      
+      this._create();
       
       return this;
     },

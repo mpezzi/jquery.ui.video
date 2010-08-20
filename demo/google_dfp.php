@@ -10,8 +10,8 @@
   <style type="text/css">@import "style.css";</style>
   <style type="text/css">@import "../players/html5/controllers/apple/css/ui.video.apple.css";</style>
   
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.3/jquery-ui.min.js"></script>
   
   <script type="text/javascript" src="../jquery.ui.video.js"></script>
   <script type="text/javascript" src="../jquery.ui.video.dfp.js"></script>
@@ -91,8 +91,6 @@
     <li><a href="?p=html5">HTML5 Version</a></li>
     <li><a href="?p=flowplayer">Flowplayer Version</a></li>
   </ul>
-  
-  
   
   <p id="controls">
     <a id="play">Play</a><br />

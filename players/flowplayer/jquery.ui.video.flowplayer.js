@@ -14,7 +14,7 @@
   $.ui.video.flowplayer = {
     player: '../players/flowplayer/swf/flowplayer-3.2.2.swf',
     
-    _init: function() {
+    _create: function() {
       var self = this, o = this.options,
           
           uiVideoContainer = $('<div class="flowplayer"></div>')
